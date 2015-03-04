@@ -21,7 +21,7 @@ components:
       - !ref FileReader
 
 - id: FileWriter
-  type: CsvSpecimenFileWriter
+  type: CsvFileWriter
   properties:
     parameters:
       outputWriter:

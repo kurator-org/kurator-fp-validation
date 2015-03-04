@@ -9,6 +9,7 @@ import org.kurator.akka.ActorConfig;
 import org.kurator.akka.KuratorAkkaTestCase;
 import org.kurator.akka.WorkflowRunner;
 import org.kurator.akka.actors.CsvFileReader;
+import org.kurator.akka.actors.CsvFileWriter;
 
 public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
@@ -38,7 +39,7 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
                 .listensTo(csvReader);
 
         csvWriter = wr.configureNewActor()
-                .actorClass(CsvSpecimenFileWriter.class)
+                .actorClass(CsvFileWriter.class)
                 .listensTo(dateValidator);
     }
 

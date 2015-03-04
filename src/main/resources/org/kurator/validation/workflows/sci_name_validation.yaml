@@ -5,7 +5,7 @@ imports:
 components:
 
 - id: FileReader
-  type: CsvSpecimenFileReader
+  type: CsvFileReader
   properties:
     parameters:
       filePath:
@@ -18,7 +18,7 @@ components:
       - !ref FileReader
 
 - id: FileWriter
-  type: CsvSpecimenFileWriter
+  type: CsvFileWriter
   properties:
     parameters:
       filePath: out.csv
