@@ -1,17 +1,17 @@
 package org.kurator.validation.data;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import fp.util.SpecimenRecord;
 
 public class OrderedSpecimenRecord extends SpecimenRecord {
 
-    private List<String> header;
+    private Set<String> header;
 
     public OrderedSpecimenRecord() {
         super();
-        header = new LinkedList<String>();
+        header = new LinkedHashSet<String>();
     }
 
     @Override
@@ -20,8 +20,9 @@ public class OrderedSpecimenRecord extends SpecimenRecord {
         return super.put(key, value);
     }
 
-    public List<String> getKeyList() {
-        return new LinkedList<String>(header);
+    @Override
+    public Set<String> keySet() {
+        return new LinkedHashSet<String>(header);
     }
 
     @Override
