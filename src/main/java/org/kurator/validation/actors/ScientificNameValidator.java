@@ -6,7 +6,7 @@ package org.kurator.validation.actors;
  */
 
 
-import org.kurator.akka.actors.AkkaActor;
+import org.kurator.akka.AkkaActor;
 
 import fp.services.INewScientificNameValidationService;
 import fp.util.CurationComment;

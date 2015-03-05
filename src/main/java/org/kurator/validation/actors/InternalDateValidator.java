@@ -9,7 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
-import org.kurator.akka.actors.AkkaActor;
+import org.kurator.akka.AkkaActor;
 
 import fp.services.IInternalDateValidationService;
 import fp.util.CurationComment;
