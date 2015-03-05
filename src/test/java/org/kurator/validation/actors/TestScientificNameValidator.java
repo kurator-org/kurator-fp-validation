@@ -30,16 +30,13 @@ public class TestScientificNameValidator extends KuratorAkkaTestCase {
 
         wr = new WorkflowRunner();
 
-        csvReader = wr.configureNewActor()
-                .actorClass(CsvFileReader.class)
+        csvReader = wr.actor(CsvFileReader.class)
                 .parameter("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
 
-        sciNameValidator = wr.configureNewActor()
-                .actorClass(ScientificNameValidator.class)
+        sciNameValidator = wr.actor(ScientificNameValidator.class)
                 .listensTo(csvReader);
 
-        csvWriter = wr.configureNewActor()
-                .actorClass(CsvFileWriter.class)
+        csvWriter = wr.actor(CsvFileWriter.class)
                 .listensTo(sciNameValidator);
     }
 
