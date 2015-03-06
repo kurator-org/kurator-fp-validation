@@ -80,6 +80,7 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_MCZ_IPT_FirstRecord() throws Exception {
 
+        csvReader.parameter("quote", '"');
         csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_first_record.csv" );
         csvWriter.parameter("outputWriter", bufferWriter);
 
@@ -95,6 +96,7 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_MCZ_IPT_Snippet() throws Exception {
 
+        csvReader.parameter("quote", '"');
         csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_snippet.csv" );
         csvWriter.parameter("outputWriter", bufferWriter);
 
