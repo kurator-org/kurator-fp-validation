@@ -1,28 +1,37 @@
 package org.kurator.validation.data;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import fp.util.SpecimenRecord;
 
 public class OrderedSpecimenRecord extends SpecimenRecord {
 
-    private Set<String> header;
-
-    public OrderedSpecimenRecord() {
-        super();
-        header = new LinkedHashSet<String>();
-    }
+    private Set<String> header = new LinkedHashSet<String>();
 
     @Override
     public String put(String key, String value) {
-        header.add(key);
-        return super.put(key, value);
+        if (!super.containsKey(key)) {
+            header.add(key);
+        }
+        return super.put(key, value.trim());
     }
 
     @Override
     public Set<String> keySet() {
         return new LinkedHashSet<String>(header);
+    }
+ 
+    @Override
+    public Collection<String> values() {
+        List<String> values = new LinkedList<String>();
+        for (String fieldName : header) {
+            values.add(get(fieldName));
+        }
+        return values;
     }
 
     @Override
@@ -47,6 +56,6 @@ public class OrderedSpecimenRecord extends SpecimenRecord {
 
         return buffer.toString();
     }
-    private static final long serialVersionUID = 1L;
 
+    private static final long serialVersionUID = 1L;
 }
