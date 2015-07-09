@@ -7,17 +7,16 @@ package org.kurator.validation.actors;
 
 
 import org.kurator.akka.AkkaActor;
-
-import fp.services.INewScientificNameValidationService;
-import fp.util.CurationComment;
-import fp.util.CurationCommentType;
-import fp.util.CurationStatus;
-import fp.util.SpecimenRecord;
-import fp.util.SpecimenRecordTypeConf;
+import org.filteredpush.kuration.interfaces.INewScientificNameValidationService;
+import org.filteredpush.kuration.util.CurationComment;
+import org.filteredpush.kuration.util.CurationCommentType;
+import org.filteredpush.kuration.util.CurationStatus;
+import org.filteredpush.kuration.util.SpecimenRecord;
+import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
 
 public class ScientificNameValidator extends AkkaActor {
 
-    public String serviceClassQN = "fp.services.COLService";
+    public String serviceClassQN = "org.filteredpush.kuration.services.sciname.COLService";
     public boolean insertLSID = true;
 
     private String scientificNameLabel;
@@ -28,7 +27,7 @@ public class ScientificNameValidator extends AkkaActor {
 
 
     @Override
-	public void handleInitialize() {
+	public void onInitialize() {
 
         SpecimenRecordTypeConf specimenRecordTypeConf = SpecimenRecordTypeConf.getInstance();
 
@@ -59,7 +58,7 @@ public class ScientificNameValidator extends AkkaActor {
     }
 
     @Override
-	public void handleData(Object value) throws Exception {
+	public void onData(Object value) throws Exception {
 
         if (value instanceof SpecimenRecord) {
 
@@ -97,12 +96,12 @@ public class ScientificNameValidator extends AkkaActor {
                     taxonRank, kingdom, phylum, tclass, order, family);
 
             CurationStatus curationStatus = scientificNameService.getCurationStatus();
-            if (curationStatus == CurationComment.CURATED || curationStatus == CurationComment.Filled_in){
+            if (curationStatus == CurationComment.CURATED || curationStatus == CurationComment.FILLED_IN){
                 inputSpecimenRecord.put("scientificName", scientificNameService.getCorrectedScientificName());
                 inputSpecimenRecord.put("scientificNameAuthorship", scientificNameService.getCorrectedAuthor());
             }
 
-            if(!scientificNameService.getLSID().equals("")) inputSpecimenRecord.put("GUID", scientificNameService.getLSID());
+            if(!scientificNameService.getGUID().equals("")) inputSpecimenRecord.put("GUID", scientificNameService.getGUID());
 
             CurationCommentType curationComment = CurationComment.construct(curationStatus,scientificNameService.getComment(),scientificNameService.getServiceName());
 

@@ -9,19 +9,18 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import org.filteredpush.kuration.services.InternalDateValidationService;
+import org.filteredpush.kuration.util.CurationComment;
+import org.filteredpush.kuration.util.CurationCommentType;
+import org.filteredpush.kuration.util.CurationException;
+import org.filteredpush.kuration.util.CurationStatus;
+import org.filteredpush.kuration.util.SpecimenRecord;
+import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
 import org.kurator.akka.AkkaActor;
-
-import fp.services.IInternalDateValidationService;
-import fp.util.CurationComment;
-import fp.util.CurationCommentType;
-import fp.util.CurationStatus;
-import fp.util.CurrationException;
-import fp.util.SpecimenRecord;
-import fp.util.SpecimenRecordTypeConf;
 
 public class InternalDateValidator extends AkkaActor {
 
-    public String singleServiceClassQN = "fp.services.InternalDateValidationService";
+    public String singleServiceClassQN = "org.filteredpush.kuration.services.InternalDateValidationService";
 
     private String collectorLabel;
     private String yearCollectedLabel;
@@ -32,12 +31,12 @@ public class InternalDateValidator extends AkkaActor {
     private String verbatimEventDateLabel;
     private String modifiedLabel;
 
-    IInternalDateValidationService singleDateValidationService = null;
+    InternalDateValidationService singleDateValidationService = null;
     private LinkedList<SpecimenRecord> inputObjList = new LinkedList<SpecimenRecord>();
     private LinkedHashMap<String, TreeSet<SpecimenRecord>> inputDataMap = new LinkedHashMap<String, TreeSet<SpecimenRecord>>();
 
     @Override
-    public void handleInitialize() {
+    public void onInitialize() {
 
         try {
             // initialize required label
@@ -45,57 +44,57 @@ public class InternalDateValidator extends AkkaActor {
 
             collectorLabel = speicmenRecordTypeConf.getLabel("RecordedBy");
             if (collectorLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the RecordedBy label of the SpecimenRecordType is not set.");
             }
 
             yearCollectedLabel = speicmenRecordTypeConf
                     .getLabel("YearCollected");
             if (yearCollectedLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the YearCollected label of the SpecimenRecordType is not set.");
             }
 
             monthCollectedLabel = speicmenRecordTypeConf
                     .getLabel("MonthCollected");
             if (monthCollectedLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the MonthCollected label of the SpecimenRecordType is not set.");
             }
 
             dayCollectedLabel = speicmenRecordTypeConf.getLabel("DayCollected");
             if (dayCollectedLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the DayCollected label of the SpecimenRecordType is not set.");
             }
 
             eventDateLabel = speicmenRecordTypeConf.getLabel("EventDate");
             if (eventDateLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the eventDate label of the SpecimenRecordType is not set.");
             }
 
             startDayOfYearLabel = speicmenRecordTypeConf
                     .getLabel("StartDayOfYear");
             if (startDayOfYearLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the startDayOfYearLabel label of the SpecimenRecordType is not set.");
             }
 
             verbatimEventDateLabel = speicmenRecordTypeConf
                     .getLabel("VerbatimEventDate");
             if (verbatimEventDateLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the verbatimEventDate label of the SpecimenRecordType is not set.");
             }
 
             modifiedLabel = speicmenRecordTypeConf.getLabel("Modified");
             if (modifiedLabel == null) {
-                throw new CurrationException(
+                throw new CurationException(
                         getName() + " failed since the modified label of the SpecimenRecordType is not set.");
             }
 
-            singleDateValidationService = (IInternalDateValidationService) Class.forName(singleServiceClassQN).newInstance();
+            singleDateValidationService = (InternalDateValidationService) Class.forName(singleServiceClassQN).newInstance();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,7 +110,7 @@ public class InternalDateValidator extends AkkaActor {
     }
 
     @Override
-    public void handleData(Object value) throws Exception {
+    public void onData(Object value) throws Exception {
 
         if (value instanceof SpecimenRecord) {
 
@@ -134,7 +133,7 @@ public class InternalDateValidator extends AkkaActor {
             CurationStatus curationStatus = singleDateValidationService
                     .getCurationStatus();
 
-            if (curationStatus == CurationComment.CURATED || curationStatus == CurationComment.Filled_in) {
+            if (curationStatus == CurationComment.CURATED || curationStatus == CurationComment.FILLED_IN) {
                 inputSpecimenRecord.put("eventDate",
                         String.valueOf(singleDateValidationService
                                 .getCorrectedDate()));

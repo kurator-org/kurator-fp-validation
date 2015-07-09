@@ -5,8 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import fp.util.SpecimenRecord;
+import org.filteredpush.kuration.util.SpecimenRecord ;
 
 public class OrderedSpecimenRecord extends SpecimenRecord {
 
