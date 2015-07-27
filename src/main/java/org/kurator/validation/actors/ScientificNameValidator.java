@@ -89,12 +89,13 @@ public class ScientificNameValidator extends AkkaActor {
             String tclass = inputSpecimenRecord.get("tclass");
             String order = inputSpecimenRecord.get("order");
             String family = inputSpecimenRecord.get("family");
+            String genericEpithet = "";
 
             scientificNameService.validateScientificName(
-                    scientificName, author, genus, subgenus,
-                    specificEpithet, verbatimTaxonRank, infraspecificEpithet,
-                    taxonRank, kingdom, phylum, tclass, order, family);
-
+                    scientificName, author, genus, subgenus, 
+                    specificEpithet, verbatimTaxonRank, infraspecificEpithet, 
+                    taxonRank, kingdom, phylum, tclass, order, family, genericEpithet);
+            
             CurationStatus curationStatus = scientificNameService.getCurationStatus();
             if (curationStatus == CurationComment.CURATED || curationStatus == CurationComment.FILLED_IN){
                 inputSpecimenRecord.put("scientificName", scientificNameService.getCorrectedScientificName());
