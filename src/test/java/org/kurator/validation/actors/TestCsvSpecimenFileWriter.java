@@ -30,19 +30,18 @@ public class TestCsvSpecimenFileWriter extends KuratorAkkaTestCase {
          wr = new WorkflowRunner();
 
          csvReader = wr.actor(CsvFileReader.class)
-                 .parameter("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
+                       .param("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
 
          csvWriter = wr.actor(CsvFileWriter.class)
-                 .listensTo(csvReader);
+                       .listensTo(csvReader);
      }
 
     public void testCsvSpecimenFileWriter_EightLineFile() throws Exception {
 
-        csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
-        csvWriter.parameter("outputWriter", bufferWriter);
-        wr.build();
-        wr.start();
-        wr.await();
+        csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
+        csvWriter.param("outputWriter", bufferWriter);
+
+        wr.run();
 
         String expected =
             "catalogNumber,recordedBy,fieldNumber,year,month,day,decimalLatitude,decimalLongitude,geodeticDatum,country,stateProvince,county,locality,family,scientificName,scientificNameAuthorship,reproductiveCondition,InstitutionCode,CollectionCode,DatasetName,Id" + EOL +
@@ -57,5 +56,4 @@ public class TestCsvSpecimenFileWriter extends KuratorAkkaTestCase {
 
         assertEquals(expected, outputBuffer.toString());
     }
-
 }

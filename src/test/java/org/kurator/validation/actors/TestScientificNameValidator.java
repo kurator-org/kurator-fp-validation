@@ -31,7 +31,7 @@ public class TestScientificNameValidator extends KuratorAkkaTestCase {
         wr = new WorkflowRunner();
 
         csvReader = wr.actor(CsvFileReader.class)
-                .parameter("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
+                .param("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
 
         sciNameValidator = wr.actor(ScientificNameValidator.class)
                 .listensTo(csvReader);
@@ -42,32 +42,28 @@ public class TestScientificNameValidator extends KuratorAkkaTestCase {
 
     public void testScientficNameValidator_OneRecord() throws Exception {
 
-        csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv" );
-        csvWriter.parameter("outputWriter", bufferWriter);
+        csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv" );
+        csvWriter.param("outputWriter", bufferWriter);
 
-        wr.build();
-        wr.start();
-        wr.await();
+        wr.run();
 
         String expected =
             "catalogNumber,recordedBy,fieldNumber,year,month,day,decimalLatitude,decimalLongitude,geodeticDatum,country,stateProvince,county,locality,family,scientificName,scientificNameAuthorship,reproductiveCondition,InstitutionCode,CollectionCode,DatasetName,Id,GUID,scinComment,scinStatus,scinSource" + EOL +
-            "100001,Megan A. Jensen,126,2007,6,29,47.1384,-120.9263,WGS84,United States,Washington,Chelan,Wenatchee National Forest. South Cle Elum Ridge.,Asteraceae,Taraxacum erythrospermum,auct.,Flower:March;April;May;June;July;August,DAV,FilteredPush,SPNHCDEMO,926137834,http://api.gbif.org/v1/species/5393872,\"| can't construct sciName from atomic fields | No match found in Catalog of Life. |  | The provided name: Taraxacum+erythrospermum is valid after checking misspelling | No match found in Catalog of Life. | Fail to access GNI service | Got a valid result from GBIF checklistbank Backbone | The original SciName and Authorship are curated |  Authorship: Author Dissimilar Similarity: 0.14285714285714285 | Retaining original authorship string 'auct.' = of authors, meaning not intended as in the sense of Andrz. ex Besser\",NotCurated,scientificName:Taraxacum erythrospermum#scientificNameAuthorship:auct.# | Catalog Of Life | Catalog Of Life | Global Name Resolver | Catalog Of Life | Global Name Index | GBIF CheckListBank Backbone" + EOL;
+            "100001,Megan A. Jensen,126,2007,6,29,47.1384,-120.9263,WGS84,United States,Washington,Chelan,Wenatchee National Forest. South Cle Elum Ridge.,Asteraceae,Taraxacum erythrospermum,auct.,Flower:March;April;May;June;July;August,DAV,FilteredPush,SPNHCDEMO,926137834,http://api.gbif.org/v1/species/5393872,\"| can't construct sciName from atomic fields | No match found in Catalog of Life. |  | The provided name: Taraxacum+erythrospermum has a match in the GlobalNames Resolver | No match found in Catalog of Life. | Fail to access GNI service | Got a valid result from GBIF checklistbank Backbone | The original SciName and Authorship are curated |  Authorship: Author Dissimilar Similarity: 0.14285714285714285 | Retaining original authorship string 'auct.' = of authors, meaning not intended as in the sense of Andrz. ex Besser\",NotCurated,scientificName:Taraxacum erythrospermum#scientificNameAuthorship:auct.# | Catalog Of Life | Catalog Of Life | Global Name Resolver | Catalog Of Life | Global Name Index | GBIF CheckListBank Backbone" + EOL;
 
         assertEquals(expected, outputBuffer.toString());
     }
 
     public void testScientficNameValidator_EightRecords() throws Exception {
 
-       csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
-       csvWriter.parameter("outputWriter", bufferWriter);
+       csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
+       csvWriter.param("outputWriter", bufferWriter);
 
-       wr.build();
-       wr.start();
-       wr.await();
+       wr.run();
 
        String expected =
            "catalogNumber,recordedBy,fieldNumber,year,month,day,decimalLatitude,decimalLongitude,geodeticDatum,country,stateProvince,county,locality,family,scientificName,scientificNameAuthorship,reproductiveCondition,InstitutionCode,CollectionCode,DatasetName,Id,GUID,scinComment,scinStatus,scinSource" + EOL +
-           "100001,Megan A. Jensen,126,2007,6,29,47.1384,-120.9263,WGS84,United States,Washington,Chelan,Wenatchee National Forest. South Cle Elum Ridge.,Asteraceae,Taraxacum erythrospermum,auct.,Flower:March;April;May;June;July;August,DAV,FilteredPush,SPNHCDEMO,926137834,http://api.gbif.org/v1/species/5393872,\"| can't construct sciName from atomic fields | No match found in Catalog of Life. |  | The provided name: Taraxacum+erythrospermum is valid after checking misspelling | No match found in Catalog of Life. | Fail to access GNI service | Got a valid result from GBIF checklistbank Backbone | The original SciName and Authorship are curated |  Authorship: Author Dissimilar Similarity: 0.14285714285714285 | Retaining original authorship string 'auct.' = of authors, meaning not intended as in the sense of Andrz. ex Besser\",NotCurated,scientificName:Taraxacum erythrospermum#scientificNameAuthorship:auct.# | Catalog Of Life | Catalog Of Life | Global Name Resolver | Catalog Of Life | Global Name Index | GBIF CheckListBank Backbone" + EOL +
+           "100001,Megan A. Jensen,126,2007,6,29,47.1384,-120.9263,WGS84,United States,Washington,Chelan,Wenatchee National Forest. South Cle Elum Ridge.,Asteraceae,Taraxacum erythrospermum,auct.,Flower:March;April;May;June;July;August,DAV,FilteredPush,SPNHCDEMO,926137834,http://api.gbif.org/v1/species/5393872,\"| can't construct sciName from atomic fields | No match found in Catalog of Life. |  | The provided name: Taraxacum+erythrospermum has a match in the GlobalNames Resolver | No match found in Catalog of Life. | Fail to access GNI service | Got a valid result from GBIF checklistbank Backbone | The original SciName and Authorship are curated |  Authorship: Author Dissimilar Similarity: 0.14285714285714285 | Retaining original authorship string 'auct.' = of authors, meaning not intended as in the sense of Andrz. ex Besser\",NotCurated,scientificName:Taraxacum erythrospermum#scientificNameAuthorship:auct.# | Catalog Of Life | Catalog Of Life | Global Name Resolver | Catalog Of Life | Global Name Index | GBIF CheckListBank Backbone" + EOL +
            "100002,G. Rink,2503,2003,7,27,-37.25,-108.68,WGS84,United States,Colorado,,Yucca House National Monument,Asteraceae,Acroptilon repens,(L.) DC.,Flower:March;April;May;June;July;August;September,DAV,FilteredPush,SPNHCDEMO,925533578,| can't construct sciName from atomic fields | Found and resolved synonym Acroptilon repens  in Catalog of Life service. |  Authorship: Exact Match Similarity: 1.0,Valid,scientificName:Acroptilon repens#scientificNameAuthorship:(L.) DC.# | Catalog Of Life | Catalog Of Life" + EOL +
            "100003,Mark Elvin,2938,1990,5,11,34.0,-117.0,WGS84,United States,California,San Bernardino,400 m north of Cushenbury Springs,Asteraceae,Cirsium mohavense,(Greene) Petr.,Flower:June;July;August;September;October;November,DAV,FilteredPush,SPNHCDEMO,1024940716,\"| can't construct sciName from atomic fields | More than one (2) match in Catalog of Life service, may be homonym or hemihomonym. | Found accepted name Cirsium mohavense (Greene) Petr. in Catalog of Life service. |  Authorship: Exact Match Similarity: 1.0\",Valid,scientificName:Cirsium mohavense#scientificNameAuthorship:(Greene) Petr.# | Catalog Of Life | Catalog Of Life" + EOL +
            "100004,Mark Elvin,3000,1990,5,21,37.0,-118.0,WGS84,United States,California,,Northern end of The Owens Valle Bishop,Asteraceae,Cirsium mohavense,(Greene) Petr.,Flower:June;July;August;September;October;November,DAV,FilteredPush,SPNHCDEMO,1024940765,\"| can't construct sciName from atomic fields | | can't construct sciName from atomic fields | More than one (2) match in Catalog of Life service, may be homonym or hemihomonym. | Found accepted name Cirsium mohavense (Greene) Petr. in Catalog of Life service. |  Authorship: Exact Match Similarity: 1.0\",Valid,scientificName:Cirsium mohavense#scientificNameAuthorship:(Greene) Petr.# | Catalog Of Life | scientificName:Cirsium mohavense#scientificNameAuthorship:(Greene) Petr.# | Catalog Of Life | Catalog Of Life" + EOL +

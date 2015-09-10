@@ -31,7 +31,7 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
         wr = new WorkflowRunner();
 
         csvReader = wr.actor(CsvFileReader.class)
-                .parameter("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
+                .param("recordClass", "org.kurator.validation.data.OrderedSpecimenRecord");
 
         dateValidator = wr.actor(InternalDateValidator.class)
                 .listensTo(csvReader);
@@ -42,12 +42,10 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_OneRecord() throws Exception {
 
-        csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv" );
-        csvWriter.parameter("outputWriter", bufferWriter);
+        csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv" );
+        csvWriter.param("outputWriter", bufferWriter);
 
-        wr.build();
-        wr.start();
-        wr.await();
+        wr.run();
 
         String expected =
             "catalogNumber,recordedBy,fieldNumber,year,month,day,decimalLatitude,decimalLongitude,geodeticDatum,country,stateProvince,county,locality,family,scientificName,scientificNameAuthorship,reproductiveCondition,InstitutionCode,CollectionCode,DatasetName,Id,eventDate,dateComment,dateStatus,dateSource" + EOL +
@@ -58,12 +56,10 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_EightRecords() throws Exception {
 
-       csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
-       csvWriter.parameter("outputWriter", bufferWriter);
+       csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/eight_specimen_records.csv" );
+       csvWriter.param("outputWriter", bufferWriter);
 
-       wr.build();
-       wr.start();
-       wr.await();
+       wr.run();
 
        String expected =
            "catalogNumber,recordedBy,fieldNumber,year,month,day,decimalLatitude,decimalLongitude,geodeticDatum,country,stateProvince,county,locality,family,scientificName,scientificNameAuthorship,reproductiveCondition,InstitutionCode,CollectionCode,DatasetName,Id,eventDate,dateComment,dateStatus,dateSource" + EOL +
@@ -80,13 +76,11 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_MCZ_IPT_FirstRecord() throws Exception {
 
-        csvReader.parameter("quote", '"');
-        csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_first_record.csv" );
-        csvWriter.parameter("outputWriter", bufferWriter);
+        csvReader.param("quote", '"');
+        csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_first_record.csv" );
+        csvWriter.param("outputWriter", bufferWriter);
 
-        wr.build();
-        wr.start();
-        wr.await();
+        wr.run();
 
         String expected =
             "id,type,modified,language,rightsHolder,references,institutionID,institutionCode,collectionCode,ownerInstitutionCode,basisOfRecord,informationWithheld,dynamicProperties,catalogNumber,recordNumber,recordedBy,individualCount,sex,lifeStage,preparations,disposition,otherCatalogNumbers,associatedMedia,associatedOccurrences,associatedSequences,associatedTaxa,samplingProtocol,eventDate,startDayOfYear,year,month,day,verbatimEventDate,habitat,fieldNumber,higherGeography,continent,waterBody,islandGroup,island,country,stateProvince,county,locality,verbatimElevation,minimumElevationInMeters,maximumElevationInMeters,minimumDepthInMeters,maximumDepthInMeters,verbatimLatitude,verbatimLongitude,verbatimCoordinateSystem,decimalLatitude,decimalLongitude,geodeticDatum,coordinateUncertaintyInMeters,coordinatePrecision,georeferencedBy,georeferenceProtocol,georeferenceSources,geo referenceRemarks,earliestEraOrLowestErathem,latestEraOrHighestErathem,earliestPeriodOrLowestSystem,latestPeriodOrHighestSystem,earliestEpochOrLowestSeries,latestEpochOrHighestSeries,earliestAgeOrLowestStage,latestAgeOrHighestStage,lithostratigraphicTerms,group,formation,member,bed,identifiedBy,dateIdentified,identificationRemarks,identificationQualifier,identificationVerificationStatus,typeStatus,scientificName,higherClassification,kingdom,phylum,class,order,family,genus,specificEpithet,infraspecificEpithet,taxonRank,verbatimTaxonRank,scientificNameAuthorship,nomenclaturalCode,dateComment,dateStatus,dateSource" + EOL +
@@ -96,13 +90,11 @@ public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     public void testInternalDateValidator_MCZ_IPT_Snippet() throws Exception {
 
-        csvReader.parameter("quote", '"');
-        csvReader.parameter("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_snippet.csv" );
-        csvWriter.parameter("outputWriter", bufferWriter);
+        csvReader.param("quote", '"');
+        csvReader.param("filePath", "src/test/resources/org/kurator/validation/data/mcz_ipt_snippet.csv" );
+        csvWriter.param("outputWriter", bufferWriter);
 
-        wr.build();
-        wr.start();
-        wr.await();
+        wr.run();
 
         String expected =
             "id,type,modified,language,rightsHolder,references,institutionID,institutionCode,collectionCode,ownerInstitutionCode,basisOfRecord,informationWithheld,dynamicProperties,catalogNumber,recordNumber,recordedBy,individualCount,sex,lifeStage,preparations,disposition,otherCatalogNumbers,associatedMedia,associatedOccurrences,associatedSequences,associatedTaxa,samplingProtocol,eventDate,startDayOfYear,year,month,day,verbatimEventDate,habitat,fieldNumber,higherGeography,continent,waterBody,islandGroup,island,country,stateProvince,county,locality,verbatimElevation,minimumElevationInMeters,maximumElevationInMeters,minimumDepthInMeters,maximumDepthInMeters,verbatimLatitude,verbatimLongitude,verbatimCoordinateSystem,decimalLatitude,decimalLongitude,geodeticDatum,coordinateUncertaintyInMeters,coordinatePrecision,georeferencedBy,georeferenceProtocol,georeferenceSources,geo referenceRemarks,earliestEraOrLowestErathem,latestEraOrHighestErathem,earliestPeriodOrLowestSystem,latestPeriodOrHighestSystem,earliestEpochOrLowestSeries,latestEpochOrHighestSeries,earliestAgeOrLowestStage,latestAgeOrHighestStage,lithostratigraphicTerms,group,formation,member,bed,identifiedBy,dateIdentified,identificationRemarks,identificationQualifier,identificationVerificationStatus,typeStatus,scientificName,higherClassification,kingdom,phylum,class,order,family,genus,specificEpithet,infraspecificEpithet,taxonRank,verbatimTaxonRank,scientificNameAuthorship,nomenclaturalCode,dateComment,dateStatus,dateSource" + EOL +

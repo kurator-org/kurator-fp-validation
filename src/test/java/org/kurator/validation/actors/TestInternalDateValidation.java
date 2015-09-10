@@ -31,7 +31,7 @@ public class TestInternalDateValidation extends KuratorAkkaTestCase {
         WorkflowRunner wr = new YamlFileWorkflowRunner(RESOURCE_PATH + "internal_date_validation.yaml");
         wr.apply("in", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv");
         wr.apply("writer", bufferWriter);
-        wr.build();
+        
         wr.run();
 
         String expected =
