@@ -16,9 +16,9 @@ import org.filteredpush.kuration.util.CurationException;
 import org.filteredpush.kuration.util.CurationStatus;
 import org.filteredpush.kuration.util.SpecimenRecord;
 import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
-import org.kurator.akka.AkkaActor;
+import org.kurator.akka.KuratorActor;
 
-public class InternalDateValidator extends AkkaActor {
+public class InternalDateValidator extends KuratorActor {
 
     public String singleServiceClassQN = "org.filteredpush.kuration.services.InternalDateValidationService";
 

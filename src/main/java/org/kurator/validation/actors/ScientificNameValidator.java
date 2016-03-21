@@ -6,7 +6,7 @@ package org.kurator.validation.actors;
  */
 
 
-import org.kurator.akka.AkkaActor;
+import org.kurator.akka.KuratorActor;
 import org.filteredpush.kuration.interfaces.INewScientificNameValidationService;
 import org.filteredpush.kuration.util.CurationComment;
 import org.filteredpush.kuration.util.CurationCommentType;
@@ -14,7 +14,7 @@ import org.filteredpush.kuration.util.CurationStatus;
 import org.filteredpush.kuration.util.SpecimenRecord;
 import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
 
-public class ScientificNameValidator extends AkkaActor {
+public class ScientificNameValidator extends KuratorActor {
 
     public String serviceClassQN = "org.filteredpush.kuration.services.sciname.COLService";
     public boolean insertLSID = true;
