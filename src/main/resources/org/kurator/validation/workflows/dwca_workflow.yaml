@@ -16,20 +16,41 @@ components:
     listensTo:
       - !ref FileReader
 
-- id: FileWriter
-  type: CsvFileWriter
+- id: BasisOfRecValidator
+  type: BasisOfRecordValidator
   properties:
-    parameters:
-      filePath: out.csv
     listensTo:
       - !ref NameValidator
-  
-- id: SciNameValidationWorkflow
+
+- id: DateValidator
+  type: InternalDateValidator
+  properties:
+    listensTo:
+      - !ref BasisOfRecValidator
+
+- id: GeoValidator
+  type: GEORefValidator
+  properties:
+    listensTo:
+      - !ref DateValidator
+
+- id: FileWriter
+  type: JsonSummaryWriter
+  properties:
+    parameters:
+      filePath: out.json
+    listensTo:
+      - !ref GeoValidator
+
+- id: GeoValidationWorkflow
   type: Workflow
   properties:
     actors:
       - !ref FileReader
       - !ref NameValidator
+      - !ref BasisOfRecValidator
+      - !ref DateValidator
+      - !ref GeoValidator
       - !ref FileWriter
     parameters:
       in:

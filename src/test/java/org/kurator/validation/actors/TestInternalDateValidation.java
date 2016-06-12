@@ -5,7 +5,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-import org.kurator.akka.KuratorAkkaCLI;
 import org.kurator.akka.KuratorAkkaTestCase;
 import org.kurator.akka.WorkflowRunner;
 import org.kurator.akka.YamlFileWorkflowRunner;
@@ -20,7 +19,6 @@ public class TestInternalDateValidation extends KuratorAkkaTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        KuratorAkkaCLI.enableLog4J();
 
         outputBuffer = new ByteArrayOutputStream();
         bufferWriter = new OutputStreamWriter(outputBuffer);
@@ -28,7 +26,8 @@ public class TestInternalDateValidation extends KuratorAkkaTestCase {
 
     public void testInternalDataValidation_OneSpecimenRecord() throws Exception {
 
-        WorkflowRunner wr = new YamlFileWorkflowRunner(RESOURCE_PATH + "internal_date_validation.yaml");
+        YamlFileWorkflowRunner wr = new YamlFileWorkflowRunner();
+        wr.yamlFile(RESOURCE_PATH + "internal_date_validation.yaml");
         wr.apply("in", "src/test/resources/org/kurator/validation/data/one_specimen_record.csv");
         wr.apply("writer", bufferWriter);
         

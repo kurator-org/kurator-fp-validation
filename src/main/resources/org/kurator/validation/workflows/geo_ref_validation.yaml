@@ -10,8 +10,8 @@ components:
     parameters:
       filePath: src/test/resources/org/kurator/validation/data/eight_specimen_records.csv
 
-- id: NameValidator
-  type: ScientificNameValidator
+- id: GeoValidator
+  type: GEORefValidator
   properties:
     listensTo:
       - !ref FileReader
@@ -22,14 +22,14 @@ components:
     parameters:
       filePath: out.csv
     listensTo:
-      - !ref NameValidator
+      - !ref GeoValidator
   
-- id: SciNameValidationWorkflow
+- id: GeoValidationWorkflow
   type: Workflow
   properties:
     actors:
       - !ref FileReader
-      - !ref NameValidator
+      - !ref GeoValidator
       - !ref FileWriter
     parameters:
       in:

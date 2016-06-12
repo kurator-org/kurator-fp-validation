@@ -10,8 +10,18 @@ types:
   properties:
     actorClass: org.kurator.akka.actors.CsvFileReader
     defaults:
-      recordClass: org.kurator.validation.data.OrderedSpecimenRecord
-      
+      recordClass: org.filteredpush.kuration.util.SpecimenRecord
+
+- id: DwCaFileReader
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.io.DwCaReader
+
+- id: JsonSummaryWriter
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.io.JsonSummaryWriter
+
 - id: ScientificNameValidator
   type: Actor
   properties:
@@ -21,3 +31,13 @@ types:
   type: Actor
   properties:
     actorClass: org.kurator.validation.actors.InternalDateValidator
+
+- id: GEORefValidator
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.GEORefValidator
+
+- id: BasisOfRecordValidator
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.BasisOfRecordValidator

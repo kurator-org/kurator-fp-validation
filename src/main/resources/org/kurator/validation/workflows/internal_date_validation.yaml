@@ -12,7 +12,7 @@ components:
   type: CsvSpecimenFileReader
   properties:
     parameters:
-      filePath:
+      filePath: src/test/resources/org/kurator/validation/data/eight_specimen_records.csv
 
 - id: DateValidator
   type: InternalDateValidator
