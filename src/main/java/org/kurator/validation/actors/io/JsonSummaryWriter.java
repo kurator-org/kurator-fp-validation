@@ -30,6 +30,7 @@ public class JsonSummaryWriter extends KuratorActor {
     //private final OutputStreamWriter ost;
 
     public String filePath;
+    private File file;
 
     private int validCount = 0;
     private MongoClient _mongoClient;
@@ -51,7 +52,8 @@ public class JsonSummaryWriter extends KuratorActor {
     protected void onStart() throws Exception {
         constructMaps();
 
-        _outputFile = new OutputStreamWriter(new FileOutputStream(new File(filePath)), "UTF-8");
+        file = new File(filePath);
+        _outputFile = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         _outputFile.write("[");
     }
 
@@ -180,6 +182,8 @@ public class JsonSummaryWriter extends KuratorActor {
         try {
             _outputFile.write("]");
             _outputFile.close();
+
+            publishArtifact("output_json", file.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -305,9 +309,12 @@ public class JsonSummaryWriter extends KuratorActor {
                     _outputFile.write(",\n");
                 }
 
-                _outputFile.write(obj.toJSONString());
+                String json = obj.toJSONString();
+                _outputFile.write(json);
 
                 _outputFile.flush();
+
+                broadcast(json);
                 /*
                 JSONObject obj1 = new JSONObject();
                 obj.put("name", "mkyong.com");

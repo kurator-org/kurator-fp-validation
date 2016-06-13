@@ -22,6 +22,11 @@ types:
   properties:
     actorClass: org.kurator.validation.actors.io.JsonSummaryWriter
 
+- id: AnalysisSpreadsheetBuilder
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.io.AnalysisSpreadsheetBuilder
+
 - id: ScientificNameValidator
   type: Actor
   properties:

@@ -34,13 +34,21 @@ components:
     listensTo:
       - !ref DateValidator
 
-- id: FileWriter
+- id: SummaryWriter
   type: JsonSummaryWriter
   properties:
     parameters:
       filePath: out.json
     listensTo:
       - !ref GeoValidator
+
+- id: SpreadsheetWriter
+  type: AnalysisSpreadsheetBuilder
+  properties:
+    parameters:
+      filePath: out.xls
+    listensTo:
+      - !ref SummaryWriter
 
 - id: GeoValidationWorkflow
   type: Workflow
@@ -51,11 +59,12 @@ components:
       - !ref BasisOfRecValidator
       - !ref DateValidator
       - !ref GeoValidator
-      - !ref FileWriter
+      - !ref SummaryWriter
+      - !ref SpreadsheetWriter
     parameters:
       in:
         actor: !ref FileReader
         parameter: filePath
       out:
-        actor: !ref FileWriter
+        actor: !ref SummaryWriter
         parameter: filePath
