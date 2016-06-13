@@ -37,16 +37,12 @@ components:
 - id: SummaryWriter
   type: JsonSummaryWriter
   properties:
-    parameters:
-      filePath: out.json
     listensTo:
       - !ref GeoValidator
 
 - id: SpreadsheetWriter
   type: AnalysisSpreadsheetBuilder
   properties:
-    parameters:
-      filePath: out.xls
     listensTo:
       - !ref SummaryWriter
 
