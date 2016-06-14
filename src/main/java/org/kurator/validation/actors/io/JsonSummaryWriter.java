@@ -52,7 +52,7 @@ public class JsonSummaryWriter extends KuratorActor {
     protected void onStart() throws Exception {
         constructMaps();
 
-        file = File.createTempFile("output", ".json");
+        file = File.createTempFile("output_", ".json");
         _outputFile = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
         _outputFile.write("[");
     }

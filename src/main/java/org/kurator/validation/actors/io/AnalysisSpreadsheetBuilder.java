@@ -137,7 +137,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
             autoSizeColumns(wb.getSheetAt(i), maxCols);
         }
 
-        File file = File.createTempFile("output", ".xls");
+        File file = File.createTempFile("output_", ".xls");
         wb.write(new FileOutputStream(file));
 
         wb.close();
