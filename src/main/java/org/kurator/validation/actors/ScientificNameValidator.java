@@ -27,7 +27,7 @@ public class ScientificNameValidator extends KuratorActor {
     public boolean insertLSID = true;
     public boolean insertGUID = true;
 
-    public String authorityName = "GBIF";
+    public String authorityName;
     public boolean taxonomicMode = false;
 
     private String scientificNameLabel;
