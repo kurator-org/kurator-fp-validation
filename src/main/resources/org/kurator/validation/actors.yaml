@@ -17,15 +17,20 @@ types:
   properties:
     actorClass: org.kurator.validation.actors.io.DwCaReader
 
-- id: JsonSummaryWriter
+- id: AnalysisSummaryTranslator
   type: Actor
   properties:
-    actorClass: org.kurator.validation.actors.io.JsonSummaryWriter
+    actorClass: org.kurator.validation.actors.io.AnalysisSummaryTranslator
 
 - id: AnalysisSpreadsheetBuilder
   type: Actor
   properties:
     actorClass: org.kurator.validation.actors.io.AnalysisSpreadsheetBuilder
+
+- id: JsonSummaryAggregator
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.io.JsonSummaryAggregator
 
 - id: ScientificNameValidator
   type: Actor

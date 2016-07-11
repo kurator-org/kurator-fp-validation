@@ -36,8 +36,8 @@ components:
     listensTo:
       - !ref DateValidator
 
-- id: SummaryWriter
-  type: JsonSummaryWriter
+- id: SummaryTranslator
+  type: AnalysisSummaryTranslator
   properties:
     listensTo:
       - !ref GeoValidator
@@ -46,7 +46,28 @@ components:
   type: AnalysisSpreadsheetBuilder
   properties:
     listensTo:
-      - !ref SummaryWriter
+      - !ref SummaryTranslator
+
+- id: SummaryAggregator
+  type: JsonSummaryAggregator
+  properties:
+    listensTo:
+      - !ref SummaryTranslator
+
+# Create an outcome stats spreadsheet from the input json
+- id: OutcomeStats
+  type: PythonActor
+  properties:
+    module: kurator_fp.outcome_stats
+    onData: outcomestats
+    inputs:
+      workspace : workspace
+      outputfile : inputfile
+    parameters:
+      configfile: "packages/kurator_fp/config/stats.ini"
+      outputfile: "outcomeStats.xlsx"
+    listensTo:
+      !ref SummaryAggregator
 
 - id: GeoValidationWorkflow
   type: Workflow
@@ -57,14 +78,19 @@ components:
       - !ref BasisOfRecValidator
       - !ref DateValidator
       - !ref GeoValidator
-      - !ref SummaryWriter
+      - !ref SummaryTranslator
       - !ref SpreadsheetWriter
+      - !ref SummaryAggregator
+      - !ref OutcomeStats
     parameters:
       in:
         actor: !ref FileReader
         parameter: filePath
       out:
-        actor: !ref SummaryWriter
+        actor: !ref SpreadsheetWriter
+        parameter: filePath
+      json:
+        actor: !ref SummaryAggregator
         parameter: filePath
       authority:
         actor: !ref NameValidator

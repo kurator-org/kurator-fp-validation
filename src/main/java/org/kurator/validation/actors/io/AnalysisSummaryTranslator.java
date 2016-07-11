@@ -10,6 +10,7 @@ import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.kurator.akka.KuratorActor;
+import org.kurator.validation.data.AnalysisSummary;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,22 +24,9 @@ import java.util.*;
 * Date: 06.05.2013
 * Time: 13:06
 */
-public class JsonSummaryWriter extends KuratorActor {
-
-    int invoc = 0;
-    private int reportSize = 1000;
-    //private final OutputStreamWriter ost;
-
-    public String filePath;
-    private File file;
+public class AnalysisSummaryTranslator extends KuratorActor {
 
     private int validCount = 0;
-    private MongoClient _mongoClient;
-    private DB _db;
-    private DBCollection _collection;
-    private OutputStreamWriter _outputFile;
-    private boolean outputToFile;
-    private boolean firstRecord = true;
 
     //private Map<String, SpecimenRecord> _OriginalRecordMap = new HashMap<String, SpecimenRecord>();
     //private Map<String, SpecimenRecord> _validatedRecordMap = new HashMap<String, SpecimenRecord>();
@@ -51,10 +39,6 @@ public class JsonSummaryWriter extends KuratorActor {
     @Override
     protected void onStart() throws Exception {
         constructMaps();
-
-        file = File.createTempFile("output_", ".json");
-        _outputFile = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-        _outputFile.write("[");
     }
 
     @Override
@@ -174,20 +158,24 @@ public class JsonSummaryWriter extends KuratorActor {
         //_recordDetailsMap.put(record.get("id"), detailSet);
         //_validatedRecordMap.put(record.get("id"), record);
 
-        writeOut(record, markers, detailSet);
-    }
-
-    @Override
-    protected void onEnd() throws Exception {
-        try {
-            _outputFile.write("]");
-            _outputFile.close();
-
-            publishArtifact("output_json", file.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
+        //add validationStatus in record
+        HashMap validationState = new HashMap<String, String>();
+        for (HashMap item: detailSet){
+            validationState.putAll((Map) item.get("ValidationState"));
         }
-        System.out.println("Wrote out " + validCount + " records");
+
+        //record.put("ValidationState", validationState);
+
+        //BasicDBObject recordObject = new BasicDBObject("Record", record);
+
+        HashMap<String, Object> modifiedRecord = new HashMap<String, Object>();
+        for (String label : record.keySet()){
+            modifiedRecord.put(label,record.get(label));
+        }
+        modifiedRecord.put("ValidationState", validationState);
+
+        AnalysisSummary summary = new AnalysisSummary(modifiedRecord, markers, detailSet);
+        broadcast(summary);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -270,64 +258,6 @@ public class JsonSummaryWriter extends KuratorActor {
 
         detailRecord.put("ValidationState", validationState);
         return detailRecord;
-    }
-
-    private void writeOut(SpecimenRecord record, HashMap<String, String> markers, HashSet<HashMap> detailSet){
-
-        //add validationStatus in record
-        HashMap validationState = new HashMap<String, String>();
-        for (HashMap item: detailSet){
-            validationState.putAll((Map) item.get("ValidationState"));
-        }
-
-        //record.put("ValidationState", validationState);
-
-        //BasicDBObject recordObject = new BasicDBObject("Record", record);
-
-        HashMap<String, Object> modifiedRecord = new HashMap<String, Object>();
-        for (String label : record.keySet()){
-            modifiedRecord.put(label,record.get(label));
-        }
-        modifiedRecord.put("ValidationState", validationState);
-
-            JSONObject obj = new JSONObject();
-            obj.put("Record", modifiedRecord);
-            obj.put("Markers", markers);
-
-            JSONArray detailList = new JSONArray();
-            for (HashMap item : detailSet){
-                detailList.add(item);
-            }
-            obj.put("ActorDetails", detailList);
-
-            try {
-                //_outputFile.write("["+obj.toString()+"]");
-
-                if(firstRecord){
-                    firstRecord = false;
-                }else{
-                    _outputFile.write(",\n");
-                }
-
-                String json = obj.toJSONString();
-                _outputFile.write(json);
-
-                _outputFile.flush();
-
-                broadcast(json);
-                /*
-                JSONObject obj1 = new JSONObject();
-                obj.put("name", "mkyong.com");
-
-                FileWriter file = new FileWriter("/home/tianhong/data/test2.json");
-                file.write(obj1.toJSONString());
-                file.flush();
-                file.close();*/
-
-            } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        validCount++;
     }
 
     private void constructMaps() {

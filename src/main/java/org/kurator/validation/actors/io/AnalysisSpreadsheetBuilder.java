@@ -28,6 +28,7 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.kurator.akka.KuratorActor;
+import org.kurator.validation.data.AnalysisSummary;
 
 import java.io.*;
 import java.util.*;
@@ -56,7 +57,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
         put("UNABLE_CURATE", "there seems to be a problem, but we don't know how to solve it");
     }};
 
-    private Map<String, String> recordColumnMap = new LinkedHashMap<String, String>() {{
+    private Map<String, String> recordColumnMap = new HashMap<String, String>() {{
         put("collectionCode", "Collection Code");
         put("institutionCode", "Institution Code");
         put("catalogNumber", "Catalog Number");
@@ -87,7 +88,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
         put("modified", "Modified");
     }};
 
-    private Map<String, String> actorDetailsColumnMap = new LinkedHashMap<String, String>(recordColumnMap) {{
+    private Map<String, String> actorDetailsColumnMap = new HashMap<String, String>() {{
         put("Actor Result", "Actor Result");
         put("Comment", "Provenance"); //JSON key is always "Comment" so we have to keep it and adjust col header here
         put("Source", "Source");
@@ -102,10 +103,14 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
 
     public boolean actionableItemsOnly;
     public String filePath;
+    private File outputFile;
 
     @Override
     protected void onInitialize() throws Exception {
         this.wb = new HSSFWorkbook();
+
+        if (filePath != null)
+            outputFile = new File(filePath);
 
         initStyles();
         initSheets();
@@ -113,17 +118,19 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
 
     @Override
     protected void onData(Object value) throws Exception {
-        ObjectMapper mapper = new ObjectMapper();
-        LinkedHashMap result = mapper.readValue((String)value, new TypeReference<LinkedHashMap>() {});
+        if (value instanceof AnalysisSummary) {
+            AnalysisSummary summary = (AnalysisSummary) value;
 
-        Map record = (LinkedHashMap)result.get("Record");
-        Map markers = (LinkedHashMap)result.get("Markers");
-        addRecord(record, markers, recordNum+1);
+            Map record = summary.getRecord();
 
-        ArrayList actorDetails = (ArrayList) result.get("ActorDetails");
-        addActorDetails(actorDetails, record, recordNum+1);
+            Map markers = (HashMap) summary.getMarkers();
+            addRecord(record, markers, recordNum + 1);
 
-        recordNum++;
+            HashSet<HashMap> actorDetails = summary.getDetailSet();
+            addActorDetails(actorDetails, record, recordNum + 1);
+
+            recordNum++;
+        }
     }
 
     @Override
@@ -137,12 +144,15 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
             autoSizeColumns(wb.getSheetAt(i), maxCols);
         }
 
-        File file = File.createTempFile("output_", ".xls");
-        wb.write(new FileOutputStream(file));
+
+        if (outputFile == null) {
+            outputFile = File.createTempFile("output_", ".xls");
+        }
+        wb.write(new FileOutputStream(outputFile));
 
         wb.close();
 
-        publishArtifact("output_xls", file.getAbsolutePath());
+        publishArtifact("output_xls", outputFile.getAbsolutePath());
     }
 
     private void initFirstSheet(long count) {
@@ -186,8 +196,8 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
      *
      * @param result a single analysis result
      */
-    private void processResult(LinkedHashMap result) {
-        Map record = (LinkedHashMap)result.get("Record");
+    private void processResult(HashMap result) {
+        Map record = (HashMap)result.get("Record");
         boolean isActionable = checkActionable(record);
 
         if (!actionableItemsOnly || actionableItemsOnly && isActionable) {
@@ -203,7 +213,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
      * @return true if actionable, false otherwise
      */
     private boolean checkActionable(Map record) {
-        LinkedHashMap validationState = (LinkedHashMap)record.get("ValidationState");
+        HashMap validationState = (HashMap)record.get("ValidationState");
         for (Object value: validationState.values()) {
             if ((((String)value).equalsIgnoreCase("CURATED") || ((String)value).equalsIgnoreCase("UNABLE_CURATE"))) {
                 return true;
@@ -256,8 +266,8 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
      * @param record the record with changes applied
      * @param rowIndex the row to add actor details to
      */
-    private void addActorDetails(ArrayList<LinkedHashMap> actorDetails, Map record, int rowIndex) {
-        for (LinkedHashMap detail: actorDetails) {
+    private void addActorDetails(HashSet<HashMap> actorDetails, Map record, int rowIndex) {
+        for (HashMap detail: actorDetails) {
             String actorName = (String)detail.get("Actor Name");
 
             // get the actor details sheet for the current actor and create a new row
@@ -265,7 +275,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
             HSSFSheet sheet = actorDetailsSheets.get(actorName);
             HSSFRow row = sheet.createRow(rowIndex);
 
-            Map validationState = (LinkedHashMap)detail.get("ValidationState");
+            Map validationState = (HashMap)detail.get("ValidationState");
 
             int colIndex = 0;
             for (String key : actorDetailsColumnMap.keySet()) {
@@ -340,7 +350,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
     private void addRecord(Map record, Map markers, int rowIndex) {
         HSSFRow row = recordSheet.createRow(rowIndex);
 
-        Map validationState = (LinkedHashMap)record.get("ValidationState");
+        Map validationState = (HashMap)record.get("ValidationState");
 
         int colIndex = 0;
         for (String key : recordColumnMap.keySet()) {

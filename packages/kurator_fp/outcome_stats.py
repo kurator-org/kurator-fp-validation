@@ -40,7 +40,7 @@ def outcomestats(options):
         artifacts - a dictionary of persistent objects created
     """
     setup_actor_logging(options)
-
+    print options
     logging.debug( 'Started %s' % __version__ )
     logging.debug( 'options: %s' % options )
 
