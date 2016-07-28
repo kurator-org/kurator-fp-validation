@@ -37,7 +37,6 @@ public class BasisOfRecordValidator extends KuratorActor {
 
         } catch (CurationException e) {
             e.printStackTrace();
-            System.exit(-1);
         }
 
         // handleScopeStart

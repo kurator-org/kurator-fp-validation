@@ -30,17 +30,14 @@ public class GEORefValidator extends KuratorActor {
             geoRefValidationService = new GeoLocate3();
             geoRefValidationService.setUseCache(useCache);
             e.printStackTrace();
-            System.exit(-1);
         } catch (IllegalAccessException e) {
             geoRefValidationService = new GeoLocate3();
             geoRefValidationService.setUseCache(useCache);
             e.printStackTrace();
-            System.exit(-1);
         } catch (ClassNotFoundException e) {
             geoRefValidationService = new GeoLocate3();
             geoRefValidationService.setUseCache(useCache);
             e.printStackTrace();
-            System.exit(-1);
         }
     }
 
@@ -121,7 +118,6 @@ public class GEORefValidator extends KuratorActor {
                     latitude = Double.valueOf(latitudeToken);
                 }catch (Exception e){
                     System.out.println("latitude token has issue: |" + latitudeToken + "|");
-                    System.exit(-1);
                 }
             }else{
                 isCoordinateMissing++;
@@ -139,7 +135,6 @@ public class GEORefValidator extends KuratorActor {
                     longitude = Double.valueOf(longitudeToken);
                 }catch (Exception e){
                     System.out.println("longitude token has issue: |" + latitudeToken + "|");
-                    System.exit(-1);
                 }
             } else {
                 isCoordinateMissing++;

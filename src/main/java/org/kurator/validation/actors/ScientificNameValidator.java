@@ -7,17 +7,12 @@ package org.kurator.validation.actors;
 
 
 import org.filteredpush.kuration.services.sciname.*;
+import org.filteredpush.kuration.util.*;
 import org.gbif.api.model.checklistbank.ParsedName;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
 import org.kurator.akka.KuratorActor;
 import org.filteredpush.kuration.interfaces.INewScientificNameValidationService;
-import org.filteredpush.kuration.util.CurationComment;
-import org.filteredpush.kuration.util.CurationCommentType;
-import org.filteredpush.kuration.util.CurationStatus;
-import org.filteredpush.kuration.util.SpecimenRecord;
-import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
-import org.kurator.util.SystemClasspathManager;
 
 import java.io.IOException;
 
@@ -92,12 +87,12 @@ public class ScientificNameValidator extends KuratorActor {
             if(!taxonomicMode) scientificNameService.setValidationMode(INewScientificNameValidationService.MODE_NOMENCLATURAL);
             else scientificNameService.setValidationMode(INewScientificNameValidationService.MODE_TAXONOMIC);
 
-            //} catch (CurrationException e) {
-            //    e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        }
+            //} catch (CurationException e) {
+             //   e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
     }
 
     @Override
@@ -126,7 +121,7 @@ public class ScientificNameValidator extends KuratorActor {
                     ParsedName parse = parser.parse(scientificName);
                     author = parse.getAuthorship();
                 } catch (UnparsableException e) {
-                    System.exit(-1);
+                    CurationComment.construct(CurationComment.UNABLE_DETERMINE_VALIDITY, e.getMessage(), "ScientificNameValidator");
                 }
             }
 
@@ -156,7 +151,6 @@ public class ScientificNameValidator extends KuratorActor {
                 scientificNameService.validateScientificName( scientificName, author, genus, subgenus,specificEpithet, verbatimTaxonRank, infraspecificEpithet, taxonRank, kingdom, phylum, tclass, order, family, genericEpithet);
             } catch (Exception e) {
                 e.printStackTrace();
-                System.exit(-1);
             }
 
             CurationStatus curationStatus = scientificNameService.getCurationStatus();
