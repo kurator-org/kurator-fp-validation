@@ -40,7 +40,12 @@ types:
 - id: InternalDateValidator
   type: Actor
   properties:
-    actorClass: org.kurator.validation.actors.InternalDateValidator
+    actorClass: org.kurator.validation.actors.CollectorCollectedDateValidator
+    
+- id: EventDateValidator
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.EventDateValidator    
 
 - id: GEORefValidator
   type: Actor

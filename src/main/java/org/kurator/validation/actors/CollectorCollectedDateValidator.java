@@ -2,7 +2,10 @@ package org.kurator.validation.actors;
 
 /*
  * This code is an adaptation of akka.fp.InternalDateValidator
- * in the FP-Akka package as of 29Oct2014.
+ * in the FP-Akka package as of 29Oct2014 (where Internal references internal to 
+ * one record, in contrast to comparison of collecting events accross 
+ * records.  Renamed to match comparison of collector against date collected.
+ * 
  */
 
 import java.util.LinkedHashMap;
@@ -21,7 +24,7 @@ import org.filteredpush.kuration.util.SpecimenRecord;
 import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
 import org.kurator.akka.KuratorActor;
 
-public class InternalDateValidator extends KuratorActor {
+public class CollectorCollectedDateValidator extends KuratorActor {
     private String singleServiceClassQN = "org.filteredpush.kuration.services.InternalDateValidationService";
 
     private String collectorLabel;
@@ -151,6 +154,7 @@ public class InternalDateValidator extends KuratorActor {
                 //provide the filled in value
                 //inputSpecimenRecord.put("eventDate", String.valueOf(singleDateValidationService.getCorrectedDate()));
                 String originalDate = inputSpecimenRecord.get(SpecimenRecord.dwc_eventDate);
+                if (originalDate==null) { originalDate = ""; } 
                 String newDate = singleDateValidationService.getCorrectedDate();
                 if(originalDate != null && originalDate.length() != 0 &&  !originalDate.equals(newDate)){
                     inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, originalDate);

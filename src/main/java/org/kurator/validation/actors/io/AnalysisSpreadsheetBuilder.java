@@ -47,7 +47,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
 
     private List<Map<String, Object>> summary = new ArrayList<Map<String, Object>>();
 
-    private String[] actorNames = { "ScientificNameValidator", "DateValidator", "GeoRefValidator", "BasisOfRecordValidator" };
+    private String[] actorNames = { "ScientificNameValidator", "DateValidator", "DateValidator", "GeoRefValidator", "BasisOfRecordValidator" };
 
     private Map<String, String> validationStateTextMappings = new HashMap<String, String>() {{
         put("UNABLE_DETERMINE_VALIDITY", "don't know");
@@ -65,6 +65,7 @@ public class AnalysisSpreadsheetBuilder extends KuratorActor {
         put("occurrenceId", "occurrence Id");
         put("recordedBy", "Collector");
         put("eventDate", "Date Collected");
+        put("verbatimEventDate", "Verbatim Date Collected");        
         put("identifiedBy", "Determiner");
         put("scientificName", "Scientific Name");
         put("scientificNameAuthorship", "Scientific Name Authorship");

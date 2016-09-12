@@ -14,11 +14,17 @@ components:
     parameters:
       filePath: src/test/resources/org/kurator/validation/data/eight_specimen_records.csv
 
-- id: DateValidator
-  type: InternalDateValidator
+- id: EvDateValidator
+  type: EventDateValidator
   properties:
     listensTo:
       - !ref FileReader
+
+- id: CollDateValidator
+  type: InternalDateValidator
+  properties:
+    listensTo:
+      - !ref EvDateValidator
 
 - id: FileWriter
   type: CsvFileWriter
@@ -27,14 +33,15 @@ components:
       outputWriter:
       filePath: out.csv
     listensTo:
-      - !ref DateValidator
+      - !ref CollDateValidator
   
 - id: DateValidationWorkflow
   type: Workflow
   properties:
     actors:
       - !ref FileReader
-      - !ref DateValidator
+      - !ref EvDateValidator      
+      - !ref CollDateValidator
       - !ref FileWriter
     parameters:
       in:

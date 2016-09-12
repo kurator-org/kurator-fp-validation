@@ -23,12 +23,18 @@ components:
   properties:
     listensTo:
       - !ref NameValidator
+      
+- id: EvDateValidator
+  type: EventDateValidator
+  properties:
+    listensTo:
+      - !ref BasisOfRecValidator      
 
 - id: DateValidator
   type: InternalDateValidator
   properties:
     listensTo:
-      - !ref BasisOfRecValidator
+      - !ref EvDateValidator
 
 - id: GeoValidator
   type: GEORefValidator
@@ -76,6 +82,7 @@ components:
       - !ref FileReader
       - !ref NameValidator
       - !ref BasisOfRecValidator
+      - !ref EvDateValidator      
       - !ref DateValidator
       - !ref GeoValidator
       - !ref SummaryTranslator
