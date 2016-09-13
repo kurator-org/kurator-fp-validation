@@ -11,6 +11,7 @@ import org.filteredpush.kuration.util.*;
 import org.gbif.api.model.checklistbank.ParsedName;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
+import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.kurator.akka.KuratorActor;
 import org.filteredpush.kuration.interfaces.INewScientificNameValidationService;
 
@@ -37,7 +38,6 @@ public class ScientificNameValidator extends KuratorActor {
         //initialize required label
         SpecimenRecordTypeConf specimenRecordTypeConf = SpecimenRecordTypeConf.getInstance();
 
-
         try {
             scientificNameLabel = specimenRecordTypeConf.getLabel("ScientificName");
             if(scientificNameLabel == null){
@@ -61,6 +61,7 @@ public class ScientificNameValidator extends KuratorActor {
 
             //scientificNameService = (INewScientificNameValidationService)Class.forName(serviceClassQN).newInstance();
             //use the authority argument to select which service to use
+            if (authorityName==null) { authorityName = "GBIF"; }
             switch(authorityName.toUpperCase()) {
                 case "IF":
                 case "INDEXFUNGORUM":

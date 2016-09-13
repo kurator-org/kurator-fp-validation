@@ -154,13 +154,12 @@ public class CollectorCollectedDateValidator extends KuratorActor {
                 //provide the filled in value
                 //inputSpecimenRecord.put("eventDate", String.valueOf(singleDateValidationService.getCorrectedDate()));
                 String originalDate = inputSpecimenRecord.get(SpecimenRecord.dwc_eventDate);
-                if (originalDate==null) { originalDate = ""; } 
                 String newDate = singleDateValidationService.getCorrectedDate();
                 if(originalDate != null && originalDate.length() != 0 &&  !originalDate.equals(newDate)){
                     inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, originalDate);
                     inputSpecimenRecord.put(SpecimenRecord.dwc_eventDate, newDate);
-                } else {
-                    inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, originalDate);
+                } else if(originalDate == null || originalDate.length() == 0) { 
+                    inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, "");
                     inputSpecimenRecord.put(SpecimenRecord.dwc_eventDate, newDate);
                 }
             }

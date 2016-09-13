@@ -153,8 +153,8 @@ public class EventDateValidator extends KuratorActor {
 				if(originalDate != null && originalDate.length() != 0 &&  !originalDate.equals(newDate)){
 					inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, originalDate);
 					inputSpecimenRecord.put(SpecimenRecord.dwc_eventDate, newDate);
-				} else { 
-					inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, originalDate);
+				} else if(originalDate == null || originalDate.length() == 0) { 
+					inputSpecimenRecord.put(SpecimenRecord.Original_EventDate_Label, "");
 					inputSpecimenRecord.put(SpecimenRecord.dwc_eventDate, newDate);
 				}
 			}                
