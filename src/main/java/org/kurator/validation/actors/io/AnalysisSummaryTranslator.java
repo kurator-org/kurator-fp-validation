@@ -83,13 +83,13 @@ public class AnalysisSummaryTranslator extends KuratorActor {
             actorStatusMap.put("comment", record.get(SpecimenRecord.eventDate_Comment_Label));
             actorStatusMap.put("source", record.get(SpecimenRecord.eventDate_Source_Label));
             actorSet.add(actorStatusMap);
-        }         
-        if (record.get("dateStatus") != null) {
+        }
+        if (record.get(SpecimenRecord.date_Status_Label) != null) {
             Map<String, String> actorStatusMap = new HashMap<String, String>();
-            actorStatusMap.put("actor", "DateValidator");
-            actorStatusMap.put("status", record.get("dateStatus"));
-            actorStatusMap.put("comment", record.get("dateComment"));
-            actorStatusMap.put("source", record.get("dateSource"));
+            actorStatusMap.put("actor", "CollectionEventOutlierFinder");
+            actorStatusMap.put("status", record.get(SpecimenRecord.date_Status_Label));
+            actorStatusMap.put("comment", record.get(SpecimenRecord.date_Comment_Label));
+            actorStatusMap.put("source", record.get(SpecimenRecord.date_Source_Label));
             actorSet.add(actorStatusMap);
         }
         if (record.get("borStatus") != null) {
@@ -325,7 +325,7 @@ public class AnalysisSummaryTranslator extends KuratorActor {
 
         HashSet<String> dset = new HashSet<String>();
         dset.add(eventDateLabel);
-        highlightedLabelsMap.put("DateValidator", dset);
+        highlightedLabelsMap.put("CollectionEventOutlierFinder", dset);
         
         HashSet<String> borset = new HashSet<String>();
         borset.add(basisOfRecordLabel);

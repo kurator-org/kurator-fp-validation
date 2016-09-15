@@ -180,13 +180,13 @@ public class EventDateValidator extends KuratorActor {
             CurationCommentType comment) {
 
         if (comment != null) {
-            result.put(SpecimenRecord.date_Comment_Label, comment.getDetails());
-            result.put(SpecimenRecord.date_Status_Label, comment.getStatus());
-            result.put(SpecimenRecord.date_Source_Label, comment.getSource());
+            result.put(SpecimenRecord.eventDate_Comment_Label, comment.getDetails());
+            result.put(SpecimenRecord.eventDate_Status_Label, comment.getStatus());
+            result.put(SpecimenRecord.eventDate_Source_Label, comment.getSource());
         } else {
-            result.put(SpecimenRecord.date_Comment_Label, "None");
-            result.put(SpecimenRecord.date_Status_Label, CurationComment.CORRECT.toString());
-            result.put(SpecimenRecord.date_Source_Label, singleServiceClassQN);
+            result.put(SpecimenRecord.eventDate_Comment_Label, "None");
+            result.put(SpecimenRecord.eventDate_Status_Label, CurationComment.CORRECT.toString());
+            result.put(SpecimenRecord.eventDate_Source_Label, singleServiceClassQN);
         }
 
         broadcast(result);
