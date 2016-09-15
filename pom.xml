@@ -125,6 +125,9 @@
                             <mainClass>org.kurator.akka.KuratorCLI</mainClass>
                         </manifest>
                     </archive>
+					<descriptors>
+						<descriptor>src/assembly/packages.xml</descriptor>
+					</descriptors>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
