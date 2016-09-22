@@ -1,22 +1,11 @@
 package org.kurator.validation.actors.io;
 
-
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-
 import org.filteredpush.kuration.util.CurationComment;
 import org.filteredpush.kuration.util.SpecimenRecord;
 import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.kurator.akka.KuratorActor;
 import org.kurator.validation.data.AnalysisSummary;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.*;
 
 /**

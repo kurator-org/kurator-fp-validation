@@ -30,13 +30,31 @@
 			<version>1.1.8-SNAPSHOT</version>
 		</dependency>
 
-        <dependency>
-            <groupId>org.kurator</groupId>
-            <artifactId>kurator-validation</artifactId>
-            <version>0.4-SNAPSHOT</version>
-        </dependency>
+		<dependency>
+			<groupId>io.kamon</groupId>
+			<artifactId>kamon-core_2.11</artifactId>
+			<version>0.6.1</version>
+		</dependency>
 
-        <dependency>
+		<dependency>
+			<groupId>io.kamon</groupId>
+			<artifactId>kamon-akka_2.11</artifactId>
+			<version>0.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.kamon</groupId>
+			<artifactId>kamon-statsd_2.11</artifactId>
+			<version>0.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kurator</groupId>
+			<artifactId>kurator-validation</artifactId>
+			<version>0.4-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
@@ -58,6 +76,12 @@
 			<groupId>org.gbif</groupId>
 			<artifactId>dwca-reader</artifactId>
 			<version>1.21</version>
+		</dependency>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.2</version>
 		</dependency>
 
     </dependencies>
@@ -141,28 +165,6 @@
                     </execution>
                 </executions>
             </plugin>
-		    <plugin>
-			   <artifactId>maven-resources-plugin</artifactId>
-			   <version>2.7</version>
-			   <executions>
-				   <execution>
-					   <id>copy-resources</id>
-					   <phase>validate</phase>
-					   <goals>
-						   <goal>copy-resources</goal>
-					   </goals>
-					   <configuration>
-						   <outputDirectory>${basedir}/target/classes/packages</outputDirectory>
-						   <resources>
-							   <resource>
-								   <directory>packages</directory>
-							   </resource>
-						   </resources>
-
-					   </configuration>
-				   </execution>
-			   </executions>
-		    </plugin>
 
     	</plugins>
 

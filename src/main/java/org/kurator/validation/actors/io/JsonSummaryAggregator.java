@@ -1,14 +1,5 @@
 package org.kurator.validation.actors.io;
 
-
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.MongoClient;
-import org.filteredpush.kuration.util.CurationComment;
-import org.filteredpush.kuration.util.SpecimenRecord;
-import org.filteredpush.kuration.util.SpecimenRecordTypeConf;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.kurator.akka.KuratorActor;
 import org.kurator.akka.messages.EndOfStream;
 import org.kurator.validation.data.AnalysisSummary;
@@ -35,11 +26,7 @@ public class JsonSummaryAggregator extends KuratorActor {
     private File file;
 
     private int validCount = 0;
-    private MongoClient _mongoClient;
-    private DB _db;
-    private DBCollection _collection;
     private OutputStreamWriter _outputFile;
-    private boolean outputToFile;
     private boolean firstRecord = true;
 
     //private Map<String, SpecimenRecord> _OriginalRecordMap = new HashMap<String, SpecimenRecord>();
