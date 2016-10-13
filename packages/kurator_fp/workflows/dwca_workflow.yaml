@@ -1,0 +1,104 @@
+imports:
+
+- classpath:/org/kurator/validation/actors.yaml
+
+components:
+
+- id: FileReader
+  type: DwCaFileReader
+  properties:
+    parameters:
+      filePath: /home/lowery/Downloads/dwca-mczbase-v162.22.zip
+
+- id: NameValidator
+  type: ScientificNameValidator
+  properties:
+    listensTo:
+      - !ref FileReader
+    parameters:
+      authorityName: GBIF
+
+- id: BasisOfRecValidator
+  type: BasisOfRecordValidator
+  properties:
+    listensTo:
+      - !ref NameValidator
+      
+- id: EvDateValidator
+  type: EventDateValidator
+  properties:
+    listensTo:
+      - !ref BasisOfRecValidator      
+
+- id: DateValidator
+  type: InternalDateValidator
+  properties:
+    listensTo:
+      - !ref EvDateValidator
+
+- id: GeoValidator
+  type: GEORefValidator
+  properties:
+    listensTo:
+      - !ref DateValidator
+
+- id: SummaryTranslator
+  type: AnalysisSummaryTranslator
+  properties:
+    listensTo:
+      - !ref GeoValidator
+
+- id: SpreadsheetWriter
+  type: AnalysisSpreadsheetBuilder
+  properties:
+    listensTo:
+      - !ref SummaryTranslator
+
+- id: SummaryAggregator
+  type: JsonSummaryAggregator
+  properties:
+    listensTo:
+      - !ref SummaryTranslator
+
+# Create an outcome stats spreadsheet from the input json
+- id: OutcomeStats
+  type: PythonActor
+  properties:
+    module: kurator_fp.outcome_stats
+    onData: outcomestats
+    inputs:
+      workspace : workspace
+      outputfile : inputfile
+    parameters:
+      configfile: "packages/kurator_fp/config/stats.ini"
+      outputfile: "outcomeStats.xlsx"
+    listensTo:
+      !ref SummaryAggregator
+
+- id: GeoValidationWorkflow
+  type: Workflow
+  properties:
+    actors:
+      - !ref FileReader
+      - !ref NameValidator
+      - !ref BasisOfRecValidator
+      - !ref EvDateValidator      
+      - !ref DateValidator
+      - !ref GeoValidator
+      - !ref SummaryTranslator
+      - !ref SpreadsheetWriter
+      - !ref SummaryAggregator
+      - !ref OutcomeStats
+    parameters:
+      in:
+        actor: !ref FileReader
+        parameter: filePath
+      out:
+        actor: !ref SpreadsheetWriter
+        parameter: filePath
+      json:
+        actor: !ref SummaryAggregator
+        parameter: filePath
+      authority:
+        actor: !ref NameValidator
+        parameter: authorityName
