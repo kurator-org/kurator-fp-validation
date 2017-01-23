@@ -24,7 +24,7 @@ Build the kurator-akka project first and kurator-validation second.
 
 ### Install Jython and set environment variables ###
 
-Download the Jython 2.7.1.b3 installer jar. Run the installer from the command line in the kurator home directory.
+Download the [Jython 2.7.1.b3 installer jar](http://search.maven.org/remotecontent?filepath=org/python/jython-installer/2.7.1b3/jython-installer-2.7.1b3.jar). Run the installer from the command line in the kurator home directory.
 
     $ java -jar jython-installer-2.7.1b3.jar
 
