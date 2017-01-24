@@ -38,6 +38,22 @@ Lastly, the JYTHON_PATH environment variable should point to the directory conta
 
     $ export JYTHON_PATH=/path/to/packages
     
+### Pip install outcomeStats.py dependencies ###
+
+Use the pip installer bundled with jython to install python dependencies for the Outcome Stats workflow:
+
+    $ cd /path/to/jython/bin
+    $ ./pip install unidecode
+    $ ./pip install unicodecsv
+    $ ./pip install chardet
+    $ ./pip install xlsxwriter
+    $ ./pip install configparser
+    
+An additional change to the configparser is required, the backports package directory is missing an __init__.py file after installing. Manually adding this file fixes the issue:
+
+    $ cd /path/to/jython/Lib/site-packages/backports
+    $ touch __init__.py
+    
 ### Build kurator-fp-validation and run workflows ###
 
 Build this project via maven:
@@ -46,4 +62,4 @@ Build this project via maven:
     
 This will produce a jar-with-dependencies in the target directory of this project. Run this jar from the command-line via the following:
 
-    $ java -jar kurator-fp-validation-1.0.0-jar-with-dependencies.jar -f packages/kurator_fp/workflows/outcome_stats.yaml -p workspace=./dwca_date_validator_workspace -p configfile=packages/kurator-fp/config/stats.ini inputfile=packages/kurator-fp/data/occurrence_qc.json -p outputfile=outcomeStats.xlsx -l DEBUG
+    $ java -jar target/kurator-fp-validation-1.0.0-jar-with-dependencies.jar -f packages/kurator_fp/workflows/outcome_stats.yaml -p configfile=packages/kurator_fp/config/stats.ini -p inputfile=packages/kurator_fp/data/occurrence_qc.json -p outputfile=outcomeStats.xlsx -l DEBUG
