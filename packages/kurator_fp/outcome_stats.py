@@ -16,129 +16,14 @@ __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
 __version__ = "outcome_stats.py 2016-07-06T16:15:37-0400"
 
-from dwca_utils import response
-from dwca_utils import setup_actor_logging
-import os
-import logging
-import uuid
+from actor_decorator import python_actor
+
 from OutcomeStats import *
 from OutcomeFormats import *
 
-def outcomestats(options):
-    """Generic actor showing patterns for logging, input dictionary, and output dictionary
-       with artifacts.
-    options - a dictionary of parameters
-        loglevel - level at which to log (e.g., DEBUG) (optional)
-        workspace - path to a directory for the outputfile (optional)
-        inputfile - full path to the input file (required)
-        outputfile - name of the output file, without path (optional)
-    returns a dictionary with information about the results
-        workspace - actual path to the directory where the outputfile was written
-        outputfile - actual full path to the output file
-        success - True if process completed successfully, otherwise False
-        message - an explanation of the results
-        artifacts - a dictionary of persistent objects created
-    """
-    setup_actor_logging(options)
-    print options
-    logging.debug( 'Started %s' % __version__ )
-    logging.debug( 'options: %s' % options )
-
-    # Make a list for the response
-    returnvars = ['workspace', 'outputfile', 'success', 'message', 'artifacts']
-
-    # Make a dictionary for artifacts left behind
-    artifacts = {}
-
-    # outputs
-    workspace = None
-    outputfile = None
-    success = False
-    message = None
-
-    #abspath = os.path.abspath(__file__)
-    #dname = os.path.dirname(abspath)
-    #os.chdir(dname)
-
-    #print dname
-    #print options['configfile']
-
-    # inputs
-    try:
-        workspace = options['workspace']
-    except:
-        workspace = None
-
-    if workspace is None or len(workspace)==0:
-        workspace = './'
-
-    try:
-        inputfile = options['inputfile']
-    except:
-        inputfile = None
-
-    if inputfile is None or len(inputfile)==0:
-        message = 'No input file given'
-        returnvals = [workspace, outputfile, success, message, artifacts]
-        logging.debug('message:\n%s' % message)
-        return response(returnvars, returnvals)
-
-    if os.path.isfile(inputfile) == False:
-        message = 'Input file not found'
-        returnvals = [workspace, outputfile, success, message, artifacts]
-        logging.debug('message:\n%s' % message)
-        return response(returnvars, returnvals)
-
-    try:
-        outputfile = options['outputfile']
-    except:
-        outputfile = None
-    if outputfile is None or len(outputfile)==0:
-        outputfile='outcomeStats_'+str(uuid.uuid1())+'.xlsx'
-
-    try:
-        configfile = options['configfile']
-    except:
-        configfile = None
-    if configfile is None or len(configfile)==0:
-        message = 'No config file given'
-        returnvals = [workspace, outputfile, success, message, artifacts]
-        logging.debug('message:\n%s' % message)
-
-    # Construct the output file path in the workspace
-    outputfile = '%s/%s' % (workspace.rstrip('/'), outputfile)
-
-    # Do the actual work now that the preparation is complete
-    success = stats_to_xlsx(inputfile, outputfile, configfile)
-
-    # Add artifacts to the output dictionary if all went well
-    if success==True:
-        artifacts['output_file'] = outputfile
-
-    # Prepare the response dictionary
-    returnvals = [workspace, outputfile, success, message, artifacts]
-    logging.debug('Finishing %s' % __version__)
-    return response(returnvars, returnvals)
-
-def stats_to_xlsx(inputfile, outputfile, configfile):
-    """Generic function with input and output.
-    parameters:
-        inputfile - the full path to the input file
-        outputfile - the full path to the output file
-        outputfile - the full path to the config file
-    returns:
-        success - True if the task is completed, otherwise False
-    """
-    # Check for required values
-    if inputfile is None or len(inputfile)==0:
-        logging.debug('No input file given in do_stuff()')
-        return False
-
-    if outputfile is None or len(outputfile)==0:
-        logging.debug('No output file given in do_stuff()')
-        return False
-
-        # load entire jason file. (Note: syntactically it is a Dictionary !!! )
+@python_actor
+def outcomestats(inputfile, outputfile, configfile):
+    # load entire jason file. (Note: syntactically it is a Dictionary !!! )
     with open(inputfile) as data_file:
         fpAkkaOutput = json.load(data_file)
 
@@ -171,11 +56,8 @@ def stats_to_xlsx(inputfile, outputfile, configfile):
 
     workbook.close()
 
-    # Success
-    return True
-
 def _getoptions():
-    """Parse command line options and return them."""
+    ''' Parse command line options and return them.'''
     parser = argparse.ArgumentParser()
 
     help = 'full path to the input file (required)'
@@ -184,10 +66,10 @@ def _getoptions():
     help = 'directory for the output file (optional)'
     parser.add_argument("-w", "--workspace", help=help)
 
-    help = 'output file name, no path (optional)'
+    help = 'output file name, no path (required)'
     parser.add_argument("-o", "--outputfile", help=help)
 
-    help = 'output file name, no path (optional)'
+    help = 'config file name, no path (required)'
     parser.add_argument("-c", "--configfile", help=help)
 
     help = 'log level (e.g., DEBUG, WARNING, INFO) (optional)'
@@ -202,9 +84,10 @@ def main():
     if options.inputfile is None or len(options.inputfile)==0:
         s =  'syntax:\n'
         s += 'python outcome_stats.py'
-        s += ' -i ./data/eight_specimen_records.csv'
-        s += ' -o test_ccber_mammals_dwc_archive.zip'
-        s += ' -w ./workspace'
+        s += ' -i ./data/occurrence_qc.json'
+        s += ' -o outcomeStats.xlsx'
+        s += ' -w ./'
+        s += ' -c ./config/stats.ini'
         s += ' -l DEBUG'
         print '%s' % s
         return
@@ -217,7 +100,7 @@ def main():
     print 'optdict: %s' % optdict
 
     # Append distinct values of to vocab file
-    response=dostuffer(optdict)
+    response=outcomestats(optdict)
     print '\nresponse: %s' % response
 
 if __name__ == '__main__':
