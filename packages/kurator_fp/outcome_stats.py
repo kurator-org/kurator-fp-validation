@@ -22,19 +22,25 @@ from OutcomeStats import *
 from OutcomeFormats import *
 
 @python_actor
-def outcomestats(inputfile, outputfile, configfile):
+###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
+def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
     # load entire jason file. (Note: syntactically it is a Dictionary !!! )
     with open(inputfile) as data_file:
         fpAkkaOutput = json.load(data_file)
 
         ###### In this test, both normalized and non-normalized statistics are shown
-    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+###    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+###    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+    
+###    origin1 = [origincolumn,originrow]
+    origin1 = [origincolumn,originrow]
     workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
     worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
     #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
     stats = OutcomeStats(configfile)
-    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
     #   print(stats.getOutcomes())
     outcomeFormats = OutcomeFormats({})
     formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
@@ -52,7 +58,7 @@ def outcomestats(inputfile, outputfile, configfile):
     #   print("outcomes=", outcomes)
     validators = stats.getValidators()
     stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
-    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
+###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
 
     workbook.close()
 
@@ -75,33 +81,47 @@ def _getoptions():
     help = 'log level (e.g., DEBUG, WARNING, INFO) (optional)'
     parser.add_argument("-l", "--loglevel", help=help)
 
+    help = 'log level (e.g., DEBUG, WARNING, INFO) (optional)'
+    parser.add_argument("-ocol", "--origincolumn", help=help)
+
+    help = 'log level (e.g., DEBUG, WARNING, INFO) (optional)'
+    parser.add_argument("-orow", "--originrow", help=help)
+
     return parser.parse_args()
 
 def main():
     options = _getoptions()
     optdict = {}
 
-    if options.inputfile is None or len(options.inputfile)==0:
-        s =  'syntax:\n'
-        s += 'python outcome_stats.py'
-        s += ' -i ./data/occurrence_qc.json'
-        s += ' -o outcomeStats.xlsx'
-        s += ' -w ./'
-        s += ' -c ./config/stats.ini'
-        s += ' -l DEBUG'
-        print '%s' % s
-        return
+###    if options.inputfile is None or len(options.inputfile)==0:
+###        s =  'syntax:\n'
+###        s += 'python outcome_stats.py'
+###        s += ' -i ./data/occurrence_qc.json'
+###        s += ' -o outcomeStats.xlsx'
+###        s += ' -w ./'
+###        s += ' -c ./config/stats.ini'
+###        s += ' -l DEBUG'
+###     s += ' -ocol origincolumn'
+###        s += ' -orow origin'
+###        print '%s' % s
+###        return
 
-    optdict['inputfile'] = options.inputfile
-    optdict['outputfile'] = options.outputfile
-    optdict['workspace'] = options.workspace
-    optdict['configfile'] = options.configfile
-    optdict['loglevel'] = options.loglevel
-    print 'optdict: %s' % optdict
+#    options.inputfile= './data/occurrence_qc.json'
+#    optdict['inputfile'] = options.inputfile
+    ocol = 4
+    orow = 8
+    optdict['inputfile'] = './data/occurrence_qc.json'
+    optdict['outputfile'] = 'outcomeStats.xlsx'
+    optdict['workspace'] = './'
+    optdict['configfile'] = './config/stats.ini'
+    optdict['loglevel'] = 'DEBUG'
+    optdict['origincolumn'] = ocol
+    optdict['originrow'] = orow
+    print ('optdict: %s' % optdict)
 
     # Append distinct values of to vocab file
     response=outcomestats(optdict)
-    print '\nresponse: %s' % response
+    print ('\nresponse: %s' % response)
 
 if __name__ == '__main__':
     main()

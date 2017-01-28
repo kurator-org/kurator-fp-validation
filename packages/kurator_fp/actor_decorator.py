@@ -7,7 +7,7 @@ import inspect
 
 def python_actor(do_stuff):
     def do_stuffer(options):
-        print "path" + os.getcwd()
+        print ("path" + os.getcwd())
         setup_actor_logging(options)
 
         #logging.debug('Started %s' % __version__)

@@ -125,16 +125,21 @@ class OutcomeStats:
       bold = workbook.add_format({'bold': True})
    #   print("stats=",stats)
    #   print("outcomes=", outcomes)
-   #   print(origin)
-      worksheet.write(origin[0],origin[1],"Validator",bold)
+      print('origin=',origin)
+      headRow = origin[0]
+      headCol = origin[1]
+      
+      worksheet.write(headRow ,headCol,"Validator",bold)
       for str in outcomes :
-         col=1+origin[1]+outcomes.index(str) #insure order is as in outcomes list
-         worksheet.write(origin[0],col, str, bold) #write col header
+         col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
+         worksheet.write(headRow,col, str, bold) #write col header
       for k, v in stats.items():
-   #      print("key=",k,"val=", v)
-         row = 1+origin[0]+validators.index(k) #put rows in order of the validators list
+ ###        print("at L137 key=",k,"val=", v, "thecol=",col)
+         row = 1+headRow+validators.index(k) #put rows in order of the validators list
    #      print("row=",row)
-         worksheet.write(row,0,k) #write validator name
+###         worksheet.write(row,0,k) #write validator name
+         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
+         worksheet.write(row,col,k) #write validator name
          #write data for each validator in its own row
          for outcome, statval in v.items():
             col=1+outcomes.index(outcome) #put cols in order of the outcomes list
@@ -147,8 +152,11 @@ def main():
    args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
    workbook = xlsxwriter.Workbook(args.getOutfile())
    worksheet = workbook.add_worksheet()
-   origin1 = [0,0]
-   origin2 = [5,0]
+   ocol = 3
+   orow = 8
+   
+   origin1 = [orow,ocol]
+#   origin2 = [5,0]
 
    stats=OutcomeStats(args)
 
