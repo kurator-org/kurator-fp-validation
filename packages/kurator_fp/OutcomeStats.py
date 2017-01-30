@@ -14,6 +14,9 @@ __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
 __version__ = "OutcomeStats.py 2016-07-02T17:37:34-0400"
 
+from actor_decorator import python_actor
+from OutcomeFormats import *
+
 import json
 import xlsxwriter
 import configparser
@@ -144,8 +147,8 @@ class OutcomeStats:
          worksheet.write(row,col,k) #write validator name
          #write data for each validator in its own row
          for outcome, statval in v.items():
-            innerCol = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
-            worksheet.write(row, innerCol, statval,formats.get(outcome))
+            col = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
+            worksheet.write(row, col, statval,formats.get(outcome))
 
 def main():
    from Args import Args
@@ -162,6 +165,66 @@ def main():
 
    stats=OutcomeStats(args)
 
-if __name__ == "__main__" :
-   print("hello")
+@python_actor
+###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
+def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
+   # load entire jason file. (Note: syntactically it is a Dictionary !!! )
+   with open(inputfile) as data_file:
+      fpAkkaOutput = json.load(data_file)
+
+      ###### In this test, both normalized and non-normalized statistics are shown
+   ###    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+   ###    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+
+   ###    origin1 = [origincolumn,originrow]
+   origin1 = [origincolumn,originrow]
+   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
+   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
+   #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
+   stats = OutcomeStats(configfile)
+   ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+   ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+   #   print(stats.getOutcomes())
+   outcomeFormats = OutcomeFormats({})
+   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
+   ###################################################
+   #####createStats and stats2XLSX comprise the main #
+   # processor filling the spreadheet cells       ####
+   ###################################################
+   # if stats are normalized, results are divided by number of records
+   # otherwise, cells show total of the number of each outcome in the appropriate column
+   normalized = True
+   validatorStats = stats.createStats(fpAkkaOutput, ~normalized)
+   validatorStatsNormalized = stats.createStats(fpAkkaOutput, normalized)
+
+   outcomes = stats.getOutcomes()
+   #   print("outcomes=", outcomes)
+   validators = stats.getValidators()
+   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
+   ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
+
+   workbook.close()
+
+
+def main():
+   optdict = {}
+
+   ocol = 4
+   orow = 8
+
+   optdict['inputfile'] = './data/occurrence_qc.json'
+   optdict['outputfile'] = 'outcomeStats.xlsx'
+   optdict['workspace'] = './'
+   optdict['configfile'] = './config/stats.ini'
+   optdict['loglevel'] = 'DEBUG'
+   optdict['origincolumn'] = ocol
+   optdict['originrow'] = orow
+   print ('optdict: %s' % optdict)
+
+   # Append distinct values of to vocab file
+   response=outcomestats(optdict)
+   print ('\nresponse: %s' % response)
+
+if __name__ == '__main__':
    main()

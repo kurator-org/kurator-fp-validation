@@ -42,16 +42,18 @@ Lastly, the JYTHON_PATH environment variable should point to the directory conta
 
 Use the pip installer bundled with jython to install python dependencies for the Outcome Stats workflow:
 
-    $ cd /path/to/jython/bin
+    $ ./pip install --upgrade pip
+
+    $ cd $JYHTON_HOME/bin
     $ ./pip install unidecode
     $ ./pip install unicodecsv
     $ ./pip install chardet
     $ ./pip install xlsxwriter
-    $ ./pip install configparser
+    $ ./pip install ConfigParser
     
 An additional change to the configparser is required, the backports package directory is missing an __init__.py file after installing. Manually adding this file fixes the issue:
 
-    $ cd /path/to/jython/Lib/site-packages/backports
+    $ cd $JYHTON_HOME/Lib/site-packages/backports
     $ touch __init__.py
     
 ### Build kurator-fp-validation and run workflows ###
