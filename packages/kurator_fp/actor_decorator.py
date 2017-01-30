@@ -78,7 +78,10 @@ def python_actor(do_stuff):
                 params.append(workspace)
 
             else:
-                params.append(options[arg])
+                if (arg in options):
+                    params.append(options[arg])
+                else:
+                    raise KeyError('%s not supplied as a parameter of %s in yaml config' % (arg, do_stuff.func_name))
 
         # Do the actual work now that the preparation is complete
         success = do_stuff(*params)

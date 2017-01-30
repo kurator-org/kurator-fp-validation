@@ -29,7 +29,7 @@
 
 # __author__ = "David B. Lowery"
 # __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-# __version__ = "outcome_stats.yaml 2016-07-06T16:15:37-0400"
+# __version__ = "outcome_stats.yaml 2017-01-30T16:07:09-0500"
 
 imports:
 
@@ -59,13 +59,15 @@ components:
 - id: OutcomeStats
   type: PythonActor
   properties:
-    module: kurator_fp.outcome_stats
+    module: kurator_fp.OutcomeStats
     onData: outcomestats
     inputs:
       workspace : workspace
     parameters:
       configfile: "./config/stats.ini"
       outputfile: "outcomeStats.xlsx"
+      originrow: 0
+      origincolumn: 0
     listensTo:
       - !ref MakeWorkspace
 
