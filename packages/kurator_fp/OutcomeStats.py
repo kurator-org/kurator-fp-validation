@@ -133,18 +133,20 @@ class OutcomeStats:
       for str in outcomes :
          col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
          worksheet.write(headRow,col, str, bold) #write col header
+
       for k, v in stats.items():
+         col = headCol;
  ###        print("at L137 key=",k,"val=", v, "thecol=",col)
          row = 1+headRow+validators.index(k) #put rows in order of the validators list
+         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
    #      print("row=",row)
 ###         worksheet.write(row,0,k) #write validator name
-         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
          worksheet.write(row,col,k) #write validator name
          #write data for each validator in its own row
          for outcome, statval in v.items():
-            col=1+outcomes.index(outcome) #put cols in order of the outcomes list
-            worksheet.write(row, col, statval,formats.get(outcome))
-   
+            innerCol = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
+            worksheet.write(row, innerCol, statval,formats.get(outcome))
+
 def main():
    from Args import Args
    print("OutcomeStats.main()")
