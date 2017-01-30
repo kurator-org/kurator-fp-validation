@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2016-07-02T17:37:34-0400"
+__version__ = "OutcomeStats.py 2017-01-30T16:03:54-0500"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
@@ -150,20 +150,20 @@ class OutcomeStats:
             col = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
             worksheet.write(row, col, statval,formats.get(outcome))
 
-def main():
-   from Args import Args
-   print("OutcomeStats.main()")
+#def main():
+#   from Args import Args
+#   print("OutcomeStats.main()")
 #   print(type(self.outcomeFormats()))
-   args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
-   workbook = xlsxwriter.Workbook(args.getOutfile())
-   worksheet = workbook.add_worksheet()
-   ocol = 3
-   orow = 8
+#   args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
+#   workbook = xlsxwriter.Workbook(args.getOutfile())
+#   worksheet = workbook.add_worksheet()
+#   ocol = 3
+#   orow = 8
    
-   origin1 = [orow,ocol]
+#   origin1 = [orow,ocol]
 #   origin2 = [5,0]
 
-   stats=OutcomeStats(args)
+#   stats=OutcomeStats(args)
 
 @python_actor
 ###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
