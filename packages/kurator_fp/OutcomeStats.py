@@ -12,13 +12,15 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-01-30T16:03:54-0500"
+__version__ = "OutcomeStats.py 2017-01-31T14:47:24-0500"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
 
 import json
-import xlsxwriter
+#import xlsxwriter
+from openpyxl import Workbook
+#import openpyxl
 import configparser
 import Args
 
@@ -118,7 +120,8 @@ class OutcomeStats:
       """
       Returns a workbook to be written to **outfile**
       """
-      workbook = xlsxwriter.Workbook(outfile)
+#      workbook = xlsxwriter.Workbook(outfile)
+      workbook = openpyxl.Workbook(outfile)
       return workbook
    
    #doesn't belong in this class
@@ -178,16 +181,26 @@ def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
 
    ###    origin1 = [origincolumn,originrow]
    origin1 = [origincolumn,originrow]
-   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
-   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
+#   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
+#   wb = Workbook(outputfile, write_only=False)  # xlsxwriteropenpyxl model of an xlsx spreadsheet
+   wb = Workbook()  # xlsxwriteropenpyxl model of an xlsx spreadsheet
+#   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
+   ws = wb.create_sheet("Mysheet",0)  ##should be different openpyxl worksheet for each workflow?
+   print('type of ws=', type(ws))
    #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
    stats = OutcomeStats(configfile)
    ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
    ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+#   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+  # ws.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
+   ws['F5']=123
+   d = ws.cell(row=4, column=2, value=10)
+   ws.cell(column=origincolumn, row=originrow, value='hello')
+###   print('L199=')
    #   print(stats.getOutcomes())
    outcomeFormats = OutcomeFormats({})
-   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
+#xw   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
+   formats = outcomeFormats.initFormats(wb)  # shouldn't be attr of main class
    ###################################################
    #####createStats and stats2XLSX comprise the main #
    # processor filling the spreadheet cells       ####
@@ -201,10 +214,12 @@ def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
    outcomes = stats.getOutcomes()
    #   print("outcomes=", outcomes)
    validators = stats.getValidators()
-   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
+#x   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
+   stats.stats2XLSX(wb, ws, formats, validatorStats, origin1, outcomes, validators)
    ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
 
-   workbook.close()
+#   workbook.close()
+   wb.close()
 
 
 def main():
