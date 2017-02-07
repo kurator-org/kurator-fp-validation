@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-01-31T14:47:24-0500"
+__version__ = "OutcomeStats.py 2017-02-06T19:24:32-05:00"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
@@ -20,6 +20,8 @@ from OutcomeFormats import *
 import json
 #import xlsxwriter
 from openpyxl import Workbook
+from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+
 #import openpyxl
 import configparser
 import Args
