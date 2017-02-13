@@ -21,7 +21,7 @@ from openpyxl.styles import PatternFill, Fill, Border, Side, Alignment, Protecti
 from openpyxl import Workbook
 import argparse
 
-def style_range(ws, cell_range, border=Border(), fill=None, font=None, alignment=None):
+def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None):
     """
     Following http://openpyxl.readthedocs.io/en/default/styles.html#applying-styles
     Apply styles to a range of cells as if they were a single cell.
@@ -37,8 +37,15 @@ def style_range(ws, cell_range, border=Border(), fill=None, font=None, alignment
     left = Border(left=border.left)
     right = Border(right=border.right)
     bottom = Border(bottom=border.bottom)
-
-    first_cell = ws[cell_range.split(":")[0]]
+    print("OpenpysStyle.font=", font)
+    cell_range = range
+#    print("cell_range =", cell_range)
+#    sys.exit()
+    
+#    first_cell = ws[cell_range.split(":")[0]]
+#    print ("OpenPyxlStyle type (first_cell)=", type(first_cell))
+ #   sys.exit()
+    return
     if alignment:
         ws.merge_cells(cell_range)
         first_cell.alignment = alignment

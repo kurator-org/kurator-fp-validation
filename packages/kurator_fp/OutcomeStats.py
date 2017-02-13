@@ -21,6 +21,8 @@ import json
 #import xlsxwriter
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
+import OpenpyxlStyle
+from OpenpyxlStyle import style_range
 
 #import openpyxl
 import configparser
@@ -130,17 +132,28 @@ class OutcomeStats:
    
    def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
    #   print("fmts=",formats)
-      bold = workbook.add_format({'bold': True})
+#      bold = workbook.add_format({'bold': True})
+      
    #   print("stats=",stats)
    #   print("outcomes=", outcomes)
       print('origin=',origin)
       headRow = origin[0]
+
+
       headCol = origin[1]
-      
-      worksheet.write(headRow ,headCol,"Validator",bold)
+####  # set cell_range for call to OpenpyxlStyle.style_range(....)
+      ws=worksheet
+
+###      worksheet.write(headRow ,headCol,"Validator",bold)
+      font = Font(name='Calibri',size=11,bold='True')
+      cell_range = ws.cell(column=headCol, row=headRow, value="Validator")
+      OpenpyxlStyle.style_range(ws, cell_range, font=font)
+####
+      return
+
       for str in outcomes :
          col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
-         worksheet.write(headRow,col, str, bold) #write col header
+###         worksheet.write(headRow,col, str, bold) #write col header
 
       for k, v in stats.items():
          col = headCol;
@@ -183,26 +196,24 @@ def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
 
    ###    origin1 = [origincolumn,originrow]
    origin1 = [origincolumn,originrow]
-#   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
-#   wb = Workbook(outputfile, write_only=False)  # xlsxwriteropenpyxl model of an xlsx spreadsheet
+
    wb = Workbook()  # xlsxwriteropenpyxl model of an xlsx spreadsheet
 #   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
    ws = wb.create_sheet("Mysheet",0)  ##should be different openpyxl worksheet for each workflow?
-   print('type of ws=', type(ws))
+
    #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
    stats = OutcomeStats(configfile)
    ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
    ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
 #   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
   # ws.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   ws['F5']=123
-   d = ws.cell(row=4, column=2, value=10)
-   ws.cell(column=origincolumn, row=originrow, value='hello')
+###   d = ws.cell(row=4, column=2, value=10)
+#   ws.cell(column=origincolumn, row=originrow, value='hello')
 ###   print('L199=')
    #   print(stats.getOutcomes())
    outcomeFormats = OutcomeFormats({})
 #xw   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
-   formats = outcomeFormats.initFormats(wb)  # shouldn't be attr of main class
+   formats = outcomeFormats.initFormats(wb,ws)  # shouldn't be attr of main class
    ###################################################
    #####createStats and stats2XLSX comprise the main #
    # processor filling the spreadheet cells       ####
@@ -221,7 +232,8 @@ def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
    ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
 
 #   workbook.close()
-   wb.close()
+#   wb.close()
+   wb.save("styled2.xlsx")
 
 
 def main():

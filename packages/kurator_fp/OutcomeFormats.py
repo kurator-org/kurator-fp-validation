@@ -12,11 +12,14 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2016-07-02T17:37:34-0400"
+__version__ = "OutcomeFormats.py 2017-02-06T19:10:13-05:00"
 
 import json
 import sys
-import xlsxwriter
+#import xlsxwriter
+from openpyxl.styles import PatternFill, Fill, Border, Side, Alignment, Protection, Font, GradientFill, Alignment
+from openpyxl import Workbook
+
 import argparse
 
 class OutcomeFormats:
@@ -31,17 +34,14 @@ class OutcomeFormats:
    def setFormats(self, formats):
       return {}
    
-   def initFormats(self, workbook):
-      formatGrnFill=workbook.add_format()
-      formatRedFill=workbook.add_format()
-      formatYelFill=workbook.add_format()
-      formatMusFill=workbook.add_format()
-      formatGryFill=workbook.add_format()
-      formatGrnFill.set_bg_color('#00FF00') #lite green
-      formatRedFill.set_bg_color('#FF0000')
-      formatMusFill.set_bg_color('#DDDD00') #mustard
-      formatYelFill.set_bg_color('#FFFF00')
-      formatGryFill.set_bg_color('#888888')
+   def initFormats(self, workbook, worksheet):
+      formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
+      formatRedFill=PatternFill("solid", fgColor='FF0000')
+      formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
+      formatYelFill=PatternFill("solid", fgColor='FFFF00')
+      formatGryFill=PatternFill("solid", fgColor='888888')
+
+
       formatXFill=''
       self.formats={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
       return self.formats
