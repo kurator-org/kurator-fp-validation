@@ -135,6 +135,9 @@ class OutcomeStats:
 #   def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
    def stats2XLSX(self, optdict):
 
+      # David: construct origin from dictionary values for origincolumn and originrow
+      origin = [optdict['origincolumn'], optdict['originrow']]
+
    #   print("fmts=",formats)
 #      bold = workbook.add_format({'bold': True})
       
@@ -193,6 +196,12 @@ class OutcomeStats:
 def outcomestats(optdict):
    # load entire jason file. (Note: syntactically it is a Dictionary !!! )
    inputfile = optdict['inputfile']  #jason
+
+   # David: assigning values from optdict to local variables that used to be function args
+   configfile = optdict['configfile']
+   origincolumn = optdict['origincolumn']
+   originrow = optdict['originrow']
+
    with open(inputfile) as data_file:
       fpAkkaOutput = json.load(data_file)
 

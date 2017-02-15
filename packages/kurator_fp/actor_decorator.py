@@ -65,26 +65,27 @@ def python_actor(do_stuff):
         # Construct the output file path in the workspace
         outputfile = '%s/%s' % (workspace.rstrip('/'), outputfile)
 
-        ### Optional inputs ###
-        params = []
-        argspec = inspect.getargspec(do_stuff)
-
-        for arg in argspec.args:
-            if arg == 'inputfile':
-                params.append(inputfile)
-            elif arg == 'outputfile':
-                params.append(outputfile)
-            elif arg == 'workspace':
-                params.append(workspace)
-
-            else:
-                if (arg in options):
-                    params.append(options[arg])
-                else:
-                    raise KeyError('%s not supplied as a parameter of %s in yaml config' % (arg, do_stuff.func_name))
+        # this code maps keys in the dictionary to function args in the actor
+        # params = []
+        # argspec = inspect.getargspec(do_stuff)
+        #
+        # for arg in argspec.args:
+        #     if arg == 'inputfile':
+        #         params.append(inputfile)
+        #     elif arg == 'outputfile':
+        #         params.append(outputfile)
+        #     elif arg == 'workspace':
+        #         params.append(workspace)
+        #
+        #     else:
+        #         if (arg in options):
+        #             params.append(options[arg])
+        #         else:
+        #             raise KeyError('%s not supplied as a parameter of %s in yaml config' % (arg, do_stuff.func_name))
 
         # Do the actual work now that the preparation is complete
-        success = do_stuff(*params)
+        # success = do_stuff(*params)
+        success = do_stuff(options);
 
         # Add artifacts to the output dictionary if all went well
         if success == True:
