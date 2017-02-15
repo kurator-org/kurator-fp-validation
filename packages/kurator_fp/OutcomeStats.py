@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-02-06T19:24:32-05:00"
+__version__ = "OutcomeStats.py 2017-02-14T13:11:57-0500"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
@@ -120,17 +120,21 @@ class OutcomeStats:
             row['Validator'] = v
             writer.writerow(row)
    
-   def initWorkbook(outfile):
+#   def initWorkbook(outfile):
+   def initWorkbook(options):
       """
       Returns a workbook to be written to **outfile**
       """
 #      workbook = xlsxwriter.Workbook(outfile)
+      outfile = optdict['outputfile']
       workbook = openpyxl.Workbook(outfile)
       return workbook
    
    #doesn't belong in this class
    
-   def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
+#   def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
+   def stats2XLSX(self, optdict):
+
    #   print("fmts=",formats)
 #      bold = workbook.add_format({'bold': True})
       
@@ -147,7 +151,7 @@ class OutcomeStats:
 ###      worksheet.write(headRow ,headCol,"Validator",bold)
       font = Font(name='Calibri',size=11,bold='True')
       cell_range = ws.cell(column=headCol, row=headRow, value="Validator")
-      OpenpyxlStyle.style_range(ws, cell_range, font=font)
+      OpenpyxlStyle.style_range(ws, cell_range, border=border, fill=fill, font=font, alignment=al)
 ####
       return
 
@@ -185,8 +189,10 @@ class OutcomeStats:
 
 @python_actor
 ###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
-def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
+#def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
+def outcomestats(optdict):
    # load entire jason file. (Note: syntactically it is a Dictionary !!! )
+   inputfile = optdict['inputfile']  #jason
    with open(inputfile) as data_file:
       fpAkkaOutput = json.load(data_file)
 
@@ -228,7 +234,7 @@ def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
    #   print("outcomes=", outcomes)
    validators = stats.getValidators()
 #x   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
-   stats.stats2XLSX(wb, ws, formats, validatorStats, origin1, outcomes, validators)
+   stats.stats2XLSX(optdict)
    ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
 
 #   workbook.close()
@@ -241,6 +247,12 @@ def main():
 
    ocol = 4
    orow = 8
+   thin = Side(border_style="thin", color="000000")
+   double = Side(border_style="double", color="ff0000")
+   border = Border(top=double, left=thin, right=thin, bottom=double)
+   fill = PatternFill("solid", fgColor="DDDDDD")
+   font = Font(b=True, color="FF0000")
+   al = Alignment(horizontal="center", vertical="center")
 
    optdict['inputfile'] = './data/occurrence_qc.json'
    optdict['outputfile'] = 'outcomeStats.xlsx'
@@ -249,10 +261,15 @@ def main():
    optdict['loglevel'] = 'DEBUG'
    optdict['origincolumn'] = ocol
    optdict['originrow'] = orow
+   optdict['border'] = border
+   optdict['fill'] = fill
+   optdict['font'] = font
+   optdict['al'] = al
+   
    print ('optdict: %s' % optdict)
 
    # Append distinct values of to vocab file
-   response=outcomestats(optdict)
+   response=outcomestats( optdict)
    print ('\nresponse: %s' % response)
 
 if __name__ == '__main__':

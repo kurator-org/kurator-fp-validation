@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-06T19:10:13-05:00"
+__version__ = "OutcomeFormats.py 2017-02-14T13:11:57-0500"
 
 import json
 import sys
@@ -48,8 +48,8 @@ class OutcomeFormats:
 
 def main():
    print("OutcomeFormats.main()")
-   import statstest
-   exec(open("statstest.py").read())
+#   import statstest
+#   exec(open("statstest.py").read())
 if __name__ == "__main__" :
    main()
 

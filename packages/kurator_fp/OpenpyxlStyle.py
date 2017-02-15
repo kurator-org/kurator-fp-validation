@@ -12,7 +12,9 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OpenyxlStyle.py 2017-02-06T19:10:13-05:00"
+__version__ = "OpenpyxlStyle.py 2017-02-14T13:11:57-0500"
+
+# to adjust version date +%Y-%m-%dT%H:%M:%S%z
 
 import json
 import sys
@@ -39,13 +41,13 @@ def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None
     bottom = Border(bottom=border.bottom)
     print("OpenpysStyle.font=", font)
     cell_range = range
-#    print("cell_range =", cell_range)
+    print("cell_range =", cell_range)
 #    sys.exit()
     
-#    first_cell = ws[cell_range.split(":")[0]]
+    first_cell = ws[cell_range.split(":")[0]]
 #    print ("OpenPyxlStyle type (first_cell)=", type(first_cell))
  #   sys.exit()
-    return
+#    return
     if alignment:
         ws.merge_cells(cell_range)
         first_cell.alignment = alignment
@@ -69,6 +71,7 @@ def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None
                 c.fill = fill
 
 def main():
+    
     print("In OpenpyxlStyle.main")
     wb = Workbook()
     ws = wb.active
