@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OpenpyxlStyle.py 2017-02-14T13:11:57-0500"
+__version__ = "OpenpyxlStyle.py 2017-02-15T14:11:04-0500"
 
 # to adjust version date +%Y-%m-%dT%H:%M:%S%z
 
@@ -23,7 +23,8 @@ from openpyxl.styles import PatternFill, Fill, Border, Side, Alignment, Protecti
 from openpyxl import Workbook
 import argparse
 
-def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None):
+#def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None):
+def style_range(optdict):
     """
     Following http://openpyxl.readthedocs.io/en/default/styles.html#applying-styles
     Apply styles to a range of cells as if they were a single cell.
@@ -34,20 +35,21 @@ def style_range(ws, range, border=Border(), fill=None, font=None, alignment=None
     :param fill: An openpyxl PatternFill or GradientFill
     :param font: An openpyxl Font object
     """
-
+    border = optdict['border']
     top = Border(top=border.top)
     left = Border(left=border.left)
     right = Border(right=border.right)
     bottom = Border(bottom=border.bottom)
-    print("OpenpysStyle.font=", font)
+#    print("OpenpysStyle.font=", font)
     cell_range = range
     print("cell_range =", cell_range)
 #    sys.exit()
+    print("HELLO FROM OpenpyxlStyle L46\n")
     
-    first_cell = ws[cell_range.split(":")[0]]
+  #  first_cell = ws[cell_range.split(":")[0]]
 #    print ("OpenPyxlStyle type (first_cell)=", type(first_cell))
  #   sys.exit()
-#    return
+    return
     if alignment:
         ws.merge_cells(cell_range)
         first_cell.alignment = alignment

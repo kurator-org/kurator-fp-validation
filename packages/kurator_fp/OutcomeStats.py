@@ -12,12 +12,13 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-02-14T13:11:57-0500"
+__version__ = "OutcomeStats.py 2017-02-15T14:11:04-0500"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
 
 import json
+import sys
 #import xlsxwriter
 from openpyxl import Workbook
 from openpyxl.styles import Border, Side, PatternFill, Font, GradientFill, Alignment
@@ -149,24 +150,43 @@ class OutcomeStats:
 
       headCol = origin[1]
 ####  # set cell_range for call to OpenpyxlStyle.style_range(....)
-      ws=worksheet
+#      ws=worksheet
+      wb = optdict['workbook']
+      ws = optdict['worksheet']
+      border = optdict['border']
+      fill = optdict['fill']
+      al = optdict['alignment']
 
 ###      worksheet.write(headRow ,headCol,"Validator",bold)
-      font = Font(name='Calibri',size=11,bold='True')
+###      font = Font(name='Calibri',size=11,bold='True')
+      font = optdict['font']
       cell_range = ws.cell(column=headCol, row=headRow, value="Validator")
-      OpenpyxlStyle.style_range(ws, cell_range, border=border, fill=fill, font=font, alignment=al)
+      print("HELLO FROM OutcomeStats L163\n")
+#      OpenpyxlStyle.style_range(ws, cell_range, border=border, fill=fill, font=font, alignment=al)
+      OpenpyxlStyle.style_range(optdict)
 ####
+      validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
+      outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
+      wb = Workbook()
+      ws = wb.active
+      my_cell = ws['B6']
+      my_cell.value = "Validator"
+#      OpenpyxlStyle.style_range(ws,'B2:F4', border = border, fill=fill, font=font, alignment=al)
+      OpenpyxlStyle.style_range(optdict)
+      wb.save(optdict['outputfile'])
+      sys.exit()
       return
-
+      
+      print("HELLO FROM OutcomeStats L170\n")
       for str in outcomes :
          col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
 ###         worksheet.write(headRow,col, str, bold) #write col header
-
+      print("HELLO FROM OutcomeStats L174\n")
       for k, v in stats.items():
          col = headCol;
  ###        print("at L137 key=",k,"val=", v, "thecol=",col)
          row = 1+headRow+validators.index(k) #put rows in order of the validators list
-         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
+         print('OutcomeStats at L179 row=',row, 'thecol=',col, 'k=',k)
    #      print("row=",row)
 ###         worksheet.write(row,0,k) #write validator name
          worksheet.write(row,col,k) #write validator name
@@ -204,17 +224,11 @@ def outcomestats(optdict):
 
    with open(inputfile) as data_file:
       fpAkkaOutput = json.load(data_file)
-
-      ###### In this test, both normalized and non-normalized statistics are shown
-   ###    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-   ###    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-
-   ###    origin1 = [origincolumn,originrow]
-   origin1 = [origincolumn,originrow]
+#   origin1 = [origincolumn,originrow]
 
    wb = Workbook()  # xlsxwriteropenpyxl model of an xlsx spreadsheet
 #   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
-   ws = wb.create_sheet("Mysheet",0)  ##should be different openpyxl worksheet for each workflow?
+   ws = wb.create_sheet("stats",0)  ##should be different openpyxl worksheet for each workflow?
 
    #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
    stats = OutcomeStats(configfile)
@@ -243,8 +257,9 @@ def outcomestats(optdict):
    #   print("outcomes=", outcomes)
    validators = stats.getValidators()
 #x   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
+#   print("HELLO from L250\n")
    stats.stats2XLSX(optdict)
-   ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
+   print("HELLO\n")
 
 #   workbook.close()
 #   wb.close()
@@ -253,7 +268,9 @@ def outcomestats(optdict):
 
 def main():
    optdict = {}
-
+   
+   wb = Workbook()
+   ws = wb.active #default worksheet in wb
    ocol = 4
    orow = 8
    thin = Side(border_style="thin", color="000000")
@@ -267,18 +284,20 @@ def main():
    optdict['outputfile'] = 'outcomeStats.xlsx'
    optdict['workspace'] = './'
    optdict['configfile'] = './config/stats.ini'
-   optdict['loglevel'] = 'DEBUG'
+#   optdict['loglevel'] = 'DEBUG'
+   optdict['workbook'] = wb
+   optdict['worksheet'] = ws
    optdict['origincolumn'] = ocol
    optdict['originrow'] = orow
    optdict['border'] = border
    optdict['fill'] = fill
    optdict['font'] = font
-   optdict['al'] = al
+   optdict['alignment'] = al
    
-   print ('optdict: %s' % optdict)
+  # print ('optdict: %s' % optdict)
 
    # Append distinct values of to vocab file
-   response=outcomestats( optdict)
+   response=outcomestats(optdict)
    print ('\nresponse: %s' % response)
 
 if __name__ == '__main__':
