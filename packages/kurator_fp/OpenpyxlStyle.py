@@ -12,9 +12,9 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OpenpyxlStyle.py 2017-02-15T14:11:04-0500"
+__version__ = "OpenpyxlStyle.py 2017-02-20T18:52:21-0500"
 
-# to adjust version date +%Y-%m-%dT%H:%M:%S%z
+# will become module for stuff under test at this writing 
 
 import json
 import sys

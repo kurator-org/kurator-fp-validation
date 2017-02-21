@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-02-15T14:11:04-0500"
+__version__ = "OutcomeStats.py 2017-02-20T18:52:21-0500"
 
 from actor_decorator import python_actor
 from OutcomeFormats import *
@@ -45,11 +45,14 @@ class OutcomeStats:
       self.configFile = configfile
 #      self.configFile='stats.ini'
       config.read(self.configFile)
-      self.validators =eval( config['DEFAULT']['validators'])
-      self.maxlength= max(len(s) for s in self.validators)
-      self.outcomes = eval(config['DEFAULT']['outcomes'])
-      self.max1= max(len(s) for s in self.validators)
-      self.max2= max(len(t) for t in self.outcomes)
+     #### self.validators =eval( config['DEFAULT']['validators'])
+      validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
+      outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
+      self.maxlength= max(len(s) for s in validators)
+
+     #### self.outcomes = eval(config['DEFAULT']['outcomes'])
+      self.max1= max(len(s) for s in validators)
+      self.max2= max(len(t) for t in outcomes)
       self.maxlength = max(self.max1,self.max2)
       #self.fpa = {}
       #infile = 'occurrence_qc.json' #for now
@@ -144,7 +147,7 @@ class OutcomeStats:
       
    #   print("stats=",stats)
    #   print("outcomes=", outcomes)
-      print('origin=',origin)
+   #   print('origin=',origin)
       headRow = origin[0]
 
 
@@ -167,24 +170,32 @@ class OutcomeStats:
 ####
       validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
       outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
-      wb = Workbook()
+      
+#      wb = Workbook()
       ws = wb.active
       my_cell = ws['B6']
       my_cell.value = "Validator"
 #      OpenpyxlStyle.style_range(ws,'B2:F4', border = border, fill=fill, font=font, alignment=al)
       OpenpyxlStyle.style_range(optdict)
-      wb.save(optdict['outputfile'])
-      sys.exit()
-      return
+     # wb.save(optdict['outputfile'])
+#      sys.exit()
+#      return
       
-      print("HELLO FROM OutcomeStats L170\n")
+      print("HELLO FROM OutcomeStats L180\n")
+      formatdict={}
+      outcomeFormats = OutcomeFormats(formatdict)
+      xxx = outcomeFormats.initFormats(formatdict) #null for now
+      print("HELLO from L 188 outcomeFormats =", outcomeFormats)
+      sys.exit()
+
+      return
       for str in outcomes :
          col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
 ###         worksheet.write(headRow,col, str, bold) #write col header
-      print("HELLO FROM OutcomeStats L174\n")
+      print("HELLO FROM OutcomeStats L184\n")
       for k, v in stats.items():
          col = headCol;
- ###        print("at L137 key=",k,"val=", v, "thecol=",col)
+ ###        print("at L187 key=",k,"val=", v, "thecol=",col)
          row = 1+headRow+validators.index(k) #put rows in order of the validators list
          print('OutcomeStats at L179 row=',row, 'thecol=',col, 'k=',k)
    #      print("row=",row)
@@ -195,26 +206,13 @@ class OutcomeStats:
             col = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
             worksheet.write(row, col, statval,formats.get(outcome))
 
-#def main():
-#   from Args import Args
-#   print("OutcomeStats.main()")
-#   print(type(self.outcomeFormats()))
-#   args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
-#   workbook = xlsxwriter.Workbook(args.getOutfile())
-#   worksheet = workbook.add_worksheet()
-#   ocol = 3
-#   orow = 8
-   
-#   origin1 = [orow,ocol]
-#   origin2 = [5,0]
-
-#   stats=OutcomeStats(args)
 
 @python_actor
 ###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
 #def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
-def outcomestats(optdict):
+def outcomestatsOnData(optdict):
    # load entire jason file. (Note: syntactically it is a Dictionary !!! )
+ ###  print('\nL210 in outcomestatsOnData. optdict=', optdict)
    inputfile = optdict['inputfile']  #jason
 
    # David: assigning values from optdict to local variables that used to be function args
@@ -226,12 +224,12 @@ def outcomestats(optdict):
       fpAkkaOutput = json.load(data_file)
 #   origin1 = [origincolumn,originrow]
 
-   wb = Workbook()  # xlsxwriteropenpyxl model of an xlsx spreadsheet
+#   wb = Workbook()  # xlsxwriteropenpyxl model of an xlsx spreadsheet
 #   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
-   ws = wb.create_sheet("stats",0)  ##should be different openpyxl worksheet for each workflow?
+#   ws = wb.create_sheet("stats",0)  ##should be different openpyxl worksheet for each workflow?
 
    #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
-   stats = OutcomeStats(configfile)
+   ###stats = OutcomeStats(configfile)
    ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
    ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
 #   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
@@ -242,7 +240,10 @@ def outcomestats(optdict):
    #   print(stats.getOutcomes())
    outcomeFormats = OutcomeFormats({})
 #xw   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
-   formats = outcomeFormats.initFormats(wb,ws)  # shouldn't be attr of main class
+#   formats = outcomeFormats.initFormats(wb,ws)  # shouldn't be attr of main class
+### formats map outcome to openpyxl style data
+   formatsDict = optdict #for now
+   formats = outcomeFormats.initFormats(formatsDict)  #
    ###################################################
    #####createStats and stats2XLSX comprise the main #
    # processor filling the spreadheet cells       ####
@@ -250,25 +251,28 @@ def outcomestats(optdict):
    # if stats are normalized, results are divided by number of records
    # otherwise, cells show total of the number of each outcome in the appropriate column
    normalized = True
-   validatorStats = stats.createStats(fpAkkaOutput, ~normalized)
-   validatorStatsNormalized = stats.createStats(fpAkkaOutput, normalized)
+###   validatorStats = stats.createStats(fpAkkaOutput, ~normalized)
+###   validatorStatsNormalized = stats.createStats(fpAkkaOutput, normalized)
 
-   outcomes = stats.getOutcomes()
+####   outcomes = stats.getOutcomes()
+   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
+   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
    #   print("outcomes=", outcomes)
-   validators = stats.getValidators()
-#x   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
-#   print("HELLO from L250\n")
-   stats.stats2XLSX(optdict)
-   print("HELLO\n")
+###   validators = stats.getValidators()
 
+#x   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
+#   print("HELLO from L260\n")
+#   stats.stats2XLSX(optdict)
+   
+   print("HELLO from L265\n")
+  #### outcomestatsOnData(optdict)
 #   workbook.close()
 #   wb.close()
-   wb.save("styled2.xlsx")
+#   wb.save("styled2.xlsx")
 
 
 def main():
    optdict = {}
-   
    wb = Workbook()
    ws = wb.active #default worksheet in wb
    ocol = 4
@@ -279,6 +283,7 @@ def main():
    fill = PatternFill("solid", fgColor="DDDDDD")
    font = Font(b=True, color="FF0000")
    al = Alignment(horizontal="center", vertical="center")
+
 
    optdict['inputfile'] = './data/occurrence_qc.json'
    optdict['outputfile'] = 'outcomeStats.xlsx'
@@ -294,11 +299,20 @@ def main():
    optdict['font'] = font
    optdict['alignment'] = al
    
-  # print ('optdict: %s' % optdict)
-
-   # Append distinct values of to vocab file
-   response=outcomestats(optdict)
-   print ('\nresponse: %s' % response)
+#   print ('OutcomeStats L298 optdict: %s' % optdict)
+###   stats = OutcomeStats(optdict)
+   # formulate style
+#   formatdict = {}
+ #  frm = OutcomeFormats(formatdict)
+###   frm = OutcomeFormats(optdict)
+#   response=outcomestatsOnData(formatdict)
+   response=outcomestatsOnData(optdict)
+   print ('\nOutcomeStats response L300: %s' % response)
+###   formats = frm.initFormats(frm)
+   ws = wb.create_sheet("stats",0)  ##should be different openpyxl worksheet for each workflow?
+   stats = OutcomeStats(optdict)
+   stats.stats2XLSX(optdict)
+   wb.save(optdict['outputfile'])
 
 if __name__ == '__main__':
    main()
