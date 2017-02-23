@@ -12,13 +12,14 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-20T18:52:21-0500"
+__version__ = "OutcomeFormats.py 2017-02-20T22:35:37-0500"
 
 import json
 import sys
 #import xlsxwriter
 from openpyxl.styles import NamedStyle, PatternFill, Fill, Border, Side, Alignment, Protection, Font, GradientFill, Alignment
 from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 import argparse
 
@@ -64,8 +65,8 @@ def main():
    formatYelFill=PatternFill("solid", fgColor='FFFF00')
    formatGryFill=PatternFill("solid", fgColor='888888')
    formatsDict={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
-   grnFill = NamedStyle(name='grnFill')
-
+   #grnFill = NamedStyle(name='grnFill')
+  
    wb = Workbook()
    ws = wb.active
    originrow = 4
@@ -79,9 +80,9 @@ def main():
    fdictlen = len(formatsDict)
 #   print(fdictlen)
    theOutcomes = formatsDict.keys()
-   max2= max(len(t) for t in theOutcomes)
+   max2 = len(max(formatsDict))
    max1=max2  #for now
-   print(max2)
+#   print(max2, max3)
    
 
    
@@ -108,6 +109,29 @@ def main():
    for col, value in dims.items():
       ws.column_dimensions[col].width = value
  
+
+   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output. should get from args
+   numvalidators = len(validators)
+   row = 1+originrow
+ #  print(validators[row])
+
+#   d=ws.cell(row=row, col=0, value=validators[row])
+   i = 0
+   col = 0
+
+   maxValidatorLen = len(max(validators))
+   print(maxValidatorLen)
+   for i in range (0,numvalidators):
+#      print(validators[row])
+      value = validators[i]
+      ws.cell(row=i+originrow+1, column=origincol, value=value)
+   
+   validatorCol = get_column_letter(origincol)
+   print(validatorCol)
+   ws.column_dimensions[validatorCol].width = maxValidatorLen+8
+     
+      # make cell color extracted from outcome index
+
 
 #   sys.exit()
 ###   outcomeCORRECTcell = ws['B2']
