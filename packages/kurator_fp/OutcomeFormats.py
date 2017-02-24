@@ -178,13 +178,14 @@ def main():
 
    for col in range(1,1+len(formatsDict)):
       colname = get_column_letter(col)
-      for row in range(0,numvalidators):
+      for row in range(1,1+numvalidators):
          cellname = colname+str(row)
 #         style_range(ws,cellname, border=None, fill=theFill)
-         if row == 0:
-            theRange=cellname+":"+cellname
-         else:
-            theRange=cellname
+#         if row == 1:
+#            theRange=cellname+":"+cellname
+         theRange=cellname+":"+cellname
+#         else:
+#            theRange=cellname
          theCell = ws[cellname]
          print("theRange=",theRange)
          style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
