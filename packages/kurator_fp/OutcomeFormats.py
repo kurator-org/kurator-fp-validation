@@ -12,15 +12,15 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-20T22:35:37-0500"
+__version__ = "OutcomeFormats.py 2017-02-22T21:35:44-0500"
 
 import json
 import sys
-#import xlsxwriter
 from openpyxl.styles import NamedStyle, PatternFill, Fill, Border, Side, Alignment, Protection, Font, GradientFill, Alignment
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-
+#from OpenpyxlStyle import style_range
+from FormatUtils import style_range
 import argparse
 
 class OutcomeFormats:
@@ -53,7 +53,44 @@ class OutcomeFormats:
       
 
       return self.formats
+def style2_range(ws, cell_range, border=Border(), fill=None, font=None, alignment=None):
+    """
+    Apply styles to a range of cells as if they were a single cell.
 
+    :param ws:  Excel worksheet instance
+    :param range: An excel range to style (e.g. A1:F20)
+    :param border: An openpyxl Border
+    :param fill: An openpyxl PatternFill or GradientFill
+    :param font: An openpyxl Font object
+    """
+
+    top = Border(top=border.top)
+    left = Border(left=border.left)
+    right = Border(right=border.right)
+    bottom = Border(bottom=border.bottom)
+
+    first_cell = ws[cell_range.split(":")[0]]
+    if alignment:
+        ws.merge_cells(cell_range)
+        first_cell.alignment = alignment
+
+    rows = ws[cell_range]
+    if font:
+        first_cell.font = font
+
+    for cell in rows[0]:
+        cell.border = cell.border + top
+    for cell in rows[-1]:
+        cell.border = cell.border + bottom
+
+    for row in rows:
+        l = row[0]
+        r = row[-1]
+        l.border = l.border + left
+        r.border = r.border + right
+        if fill:
+            for c in row:
+                c.fill = fill
 def main():
    print("OutcomeFormats.main()")
    formatdict = {}
@@ -121,7 +158,7 @@ def main():
 
    maxValidatorLen = len(max(validators))
    print(maxValidatorLen)
-   for i in range (0,numvalidators):
+   for i in range(0,numvalidators):
 #      print(validators[row])
       value = validators[i]
       ws.cell(row=i+originrow+1, column=origincol, value=value)
@@ -132,8 +169,27 @@ def main():
      
       # make cell color extracted from outcome index
 
+   thin = Side(border_style="thin", color="000000")
+   double = Side(border_style="double", color="ff0000")
+   border = Border(top=double, left=thin, right=thin, bottom=double)
+   theFill = PatternFill(fill_type=None, start_color='FF000000')
+   font = Font(b=True, color="FF0000")
+   al = Alignment(horizontal="center", vertical="center")
 
-#   sys.exit()
+   for col in range(1,1+len(formatsDict)):
+      colname = get_column_letter(col)
+      for row in range(0,numvalidators):
+         cellname = colname+str(row)
+#         style_range(ws,cellname, border=None, fill=theFill)
+         if row == 0:
+            theRange=cellname+":"+cellname
+         else:
+            theRange=cellname
+         theCell = ws[cellname]
+         print("theRange=",theRange)
+         style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
+ #        c = ws[cellname]
+ #        c.fill = theFill
 ###   outcomeCORRECTcell = ws['B2']
 ###   outcomeCORRECTcell.value = "CORRECT"
 ###   wb.add_named_style(grnFill)
