@@ -172,13 +172,14 @@ def main():
    thin = Side(border_style="thin", color="000000")
    double = Side(border_style="double", color="ff0000")
    border = Border(top=double, left=thin, right=thin, bottom=double)
-   theFill = PatternFill(fill_type=None, start_color='FF000000')
-   font = Font(b=True, color="FF0000")
+#   theFill = PatternFill(fill_type=None, start_color='FF0000')
+   theFill = PatternFill("solid", fgColor="FF0000")
+   font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="center")
 
-   for col in range(1,1+len(formatsDict)):
+   for col in range(1+origincol,1+origincol+len(formatsDict)):
       colname = get_column_letter(col)
-      for row in range(1,1+numvalidators):
+      for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
 #         style_range(ws,cellname, border=None, fill=theFill)
 #         if row == 1:
@@ -187,7 +188,7 @@ def main():
 #         else:
 #            theRange=cellname
          theCell = ws[cellname]
-         print("theRange=",theRange)
+#         print("theRange=",theRange, "theFill=",theFill)
          style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
  #        c = ws[cellname]
  #        c.fill = theFill
