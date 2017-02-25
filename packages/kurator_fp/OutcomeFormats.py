@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-24T19:03:12-0500"
+__version__ = "OutcomeFormats.py 2017-02-24T22:29:03-0500"
 
 import json
 import sys
@@ -99,7 +99,7 @@ def main():
    formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
    formatRedFill=PatternFill("solid", fgColor='FF0000')
    formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
-   formatYelFill=PatternFill("solid", fgColor='FFFF00')
+   formatYelFill=PatternFill("solid", fgColor='222200')
    formatGryFill=PatternFill("solid", fgColor='888888')
    formatsDict={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
    #grnFill = NamedStyle(name='grnFill')
@@ -171,31 +171,23 @@ def main():
 
    thin = Side(border_style="thin", color="000000")
    border = Border(top=thin, left=thin, right=thin, bottom=thin)
-   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="888800")]
+   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="BBBBBB")]
    font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="center")
-   xx = formatsDict.keys()
-  ## print(xx)
+
+   j=0
    for col in range(1+origincol,1+origincol+len(formatsDict)):
-#   for col in range(1+origincol+len(formatsDict), 1+origincol):
-#      print(col)
       colname = get_column_letter(col)
       yy = formatsDict.keys()[col-origincol-1]
       zz = formatsDict.get(yy)
       print(col-origincol)
-      j = col-origincol
-      theFill = theFills[origincol-col]
+      print(j)
+      theFill = theFills[j]
+      j = j+1
       for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
-#         style_range(ws,cellname, border=None, fill=theFill)
-#         if row == 1:
-#            theRange=cellname+":"+cellname
          theRange=cellname+":"+cellname
-#         else:
-#            theRange=cellname
          theCell = ws[cellname]
-#         print("theRange=",theRange, "theFill=",theFill)
-#         theFill = PatternFill("solid",fgColor
           
          style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
 
