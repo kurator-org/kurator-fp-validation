@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-22T21:35:44-0500"
+__version__ = "OutcomeFormats.py 2017-02-24T19:03:12-0500"
 
 import json
 import sys
@@ -170,15 +170,21 @@ def main():
       # make cell color extracted from outcome index
 
    thin = Side(border_style="thin", color="000000")
-   double = Side(border_style="double", color="ff0000")
-   border = Border(top=double, left=thin, right=thin, bottom=double)
-#   theFill = PatternFill(fill_type=None, start_color='FF0000')
-   theFill = PatternFill("solid", fgColor="FF0000")
+   border = Border(top=thin, left=thin, right=thin, bottom=thin)
+   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="888800")]
    font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="center")
-
+   xx = formatsDict.keys()
+  ## print(xx)
    for col in range(1+origincol,1+origincol+len(formatsDict)):
+#   for col in range(1+origincol+len(formatsDict), 1+origincol):
+#      print(col)
       colname = get_column_letter(col)
+      yy = formatsDict.keys()[col-origincol-1]
+      zz = formatsDict.get(yy)
+      print(col-origincol)
+      j = col-origincol
+      theFill = theFills[origincol-col]
       for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
 #         style_range(ws,cellname, border=None, fill=theFill)
@@ -189,20 +195,23 @@ def main():
 #            theRange=cellname
          theCell = ws[cellname]
 #         print("theRange=",theRange, "theFill=",theFill)
+#         theFill = PatternFill("solid",fgColor
+          
          style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
- #        c = ws[cellname]
- #        c.fill = theFill
-###   outcomeCORRECTcell = ws['B2']
-###   outcomeCORRECTcell.value = "CORRECT"
-###   wb.add_named_style(grnFill)
-###   ws['B2'].style = grnFill
+
    wb.save("outcomestyled.xlsx")
    
-#   print("L69 formatsDict=",formatsDict)
-#   import statstest
-#   exec(open("statstest.py").read())
 if __name__ == "__main__" :
    main()
 
+"""
+      formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
+      formatRedFill=PatternFill("solid", fgColor='FF0000')
+      formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
+      formatYelFill=PatternFill("solid", fgColor='FFFF00')
+      formatGryFill=PatternFill("solid", fgColor='888888') 
 
-   
+      formatXFill=''
+      #next make a dict out of the set of openpyxl styles
+      self.formats={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
+"""
