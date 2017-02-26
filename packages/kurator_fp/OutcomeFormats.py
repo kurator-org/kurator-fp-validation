@@ -101,13 +101,17 @@ def main():
    formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
    formatYelFill=PatternFill("solid", fgColor='222200')
    formatGryFill=PatternFill("solid", fgColor='888888')
-   formatsDict={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
+   formatsDict={'UNABLE\nDETERMINE\nVALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED IN':formatMusFill}
    #grnFill = NamedStyle(name='grnFill')
   
    wb = Workbook()
    ws = wb.active
    originrow = 4
+   rd = ws.row_dimensions[originrow]
+   rd.height = 12 #points; could do better if can compute out
    origincol = 2
+   #headerColAl = Alignment()
+   #headerColAl.vert = Alignment.VERT_CENTER
 
 #   outcomes = eval(config['DEFAULT']['outcomes'])
 #   max1= max(len(s) for s in validators)
@@ -127,25 +131,51 @@ def main():
 
    # set outcome names as headers 
    #
+
 #   font = Font(bold=True)
    for col in range(1, 1+fdictlen):
-      value = theOutcomes[outcomeIndex] 
+      value = theOutcomes[outcomeIndex]
       cell = ws.cell(column=col+origincol, row=originrow, value=value)
+      thecol=col+origincol
+      thecolletter = get_column_letter(thecol)
+      print("L139 value = ", value, "thecolletter=",thecolletter, "col=", col, "cell=", cell)
+#      cell.style.alignment.wrap_text = True
       cell.font = Font(bold=True)
       outcomeIndex += 1
 
       #set column width based on length of column header text
       #which is taken from outcome names
    dims = {}
-   emwidth = 4 #for now
-   for row in ws.rows:
-      for cell in row:
-        if cell.value:
-            dims[cell.column] = emwidth + max((dims.get(cell.column, 0), len(cell.value)))
+   emwidth = 12 #for now
+##   for row in ws.rows:
+##      for cell in row:
+##        if cell.value:
+##            dims[cell.column] = emwidth + max((dims.get(cell.column, 0), len(cell.value)))
         #    print ("L92", cell.value, dims[cell.column])
+#   maxcolwidth = max(dims.keys())
+   ww = dims
+   maxwidth = 0
+   print("L149=",ww)
+#   alignment=Alignment(horizontal='general',
+#                       vertical='top',
+#                       text_rotation=0,
+#                       wrap_text=True,
+#                       shrink_to_fit=False,
+#                       indent=0)
    for col, value in dims.items():
       ws.column_dimensions[col].width = value
- 
+      if value > maxwidth :
+         maxwidth = value
+      print("L150 maxwidth=",maxwidth)
+   for row in ws.rows:
+#      for cell in row:
+      for outcomename in row:
+        if outcomename.value:
+            dims[outcomename.column] = emwidth + maxwidth
+#            cell.style.alignment.wrap_text = True
+            
+#            print("L161 outcomename= ",outcomename.value)
+
 
    validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output. should get from args
    numvalidators = len(validators)
@@ -165,7 +195,7 @@ def main():
    
    validatorCol = get_column_letter(origincol)
    print(validatorCol)
-   ws.column_dimensions[validatorCol].width = maxValidatorLen+8
+   ws.column_dimensions[validatorCol].width = maxValidatorLen
      
       # make cell color extracted from outcome index
 
@@ -173,23 +203,25 @@ def main():
    border = Border(top=thin, left=thin, right=thin, bottom=thin)
    theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="BBBBBB")]
    font = Font(b=True, color="000000")
-   al = Alignment(horizontal="center", vertical="center")
+   al = Alignment(horizontal="center", vertical="top", wrap_text=True)
 
    j=0
    for col in range(1+origincol,1+origincol+len(formatsDict)):
       colname = get_column_letter(col)
       yy = formatsDict.keys()[col-origincol-1]
-      zz = formatsDict.get(yy)
+#      zz = formatsDict.get(yy)
       print(col-origincol)
       print(j)
       theFill = theFills[j]
+#      print("theFill=", theFill)
       j = j+1
       for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
          theRange=cellname+":"+cellname
          theCell = ws[cellname]
-          
-         style_range(ws,theRange,border=border, fill=theFill, font=font,alignment=al)
+         style_range(ws,theRange,border=border, fill=theFill, font=font, alignment=al)
+
+   
 
    wb.save("outcomestyled.xlsx")
    
