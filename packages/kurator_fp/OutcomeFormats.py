@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-24T22:29:03-0500"
+__version__ = "OutcomeFormats.py  2017-02-26T13:56:42-0500"
 
 import json
 import sys
@@ -56,7 +56,6 @@ class OutcomeFormats:
 def style2_range(ws, cell_range, border=Border(), fill=None, font=None, alignment=None):
     """
     Apply styles to a range of cells as if they were a single cell.
-
     :param ws:  Excel worksheet instance
     :param range: An excel range to style (e.g. A1:F20)
     :param border: An openpyxl Border
@@ -211,8 +210,8 @@ def main():
       yy = formatsDict.keys()[col-origincol-1]
 #      zz = formatsDict.get(yy)
       print(col-origincol)
-      print(j)
-      theFill = theFills[j]
+      print("L213 4-j=",4-j)
+      theFill = theFills[4-j]
 #      print("theFill=", theFill)
       j = j+1
       for row in range(1+originrow,1+originrow+numvalidators):
@@ -234,7 +233,6 @@ if __name__ == "__main__" :
       formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
       formatYelFill=PatternFill("solid", fgColor='FFFF00')
       formatGryFill=PatternFill("solid", fgColor='888888') 
-
       formatXFill=''
       #next make a dict out of the set of openpyxl styles
       self.formats={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
