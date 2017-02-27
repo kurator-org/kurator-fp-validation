@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py  2017-02-26T13:56:42-0500"
+__version__ = "OutcomeFormats.py 2017-02-26T18:43:14-0500"
 
 import json
 import sys
@@ -53,43 +53,6 @@ class OutcomeFormats:
       
 
       return self.formats
-def style2_range(ws, cell_range, border=Border(), fill=None, font=None, alignment=None):
-    """
-    Apply styles to a range of cells as if they were a single cell.
-    :param ws:  Excel worksheet instance
-    :param range: An excel range to style (e.g. A1:F20)
-    :param border: An openpyxl Border
-    :param fill: An openpyxl PatternFill or GradientFill
-    :param font: An openpyxl Font object
-    """
-
-    top = Border(top=border.top)
-    left = Border(left=border.left)
-    right = Border(right=border.right)
-    bottom = Border(bottom=border.bottom)
-
-    first_cell = ws[cell_range.split(":")[0]]
-    if alignment:
-        ws.merge_cells(cell_range)
-        first_cell.alignment = alignment
-
-    rows = ws[cell_range]
-    if font:
-        first_cell.font = font
-
-    for cell in rows[0]:
-        cell.border = cell.border + top
-    for cell in rows[-1]:
-        cell.border = cell.border + bottom
-
-    for row in rows:
-        l = row[0]
-        r = row[-1]
-        l.border = l.border + left
-        r.border = r.border + right
-        if fill:
-            for c in row:
-                c.fill = fill
 def main():
    print("OutcomeFormats.main()")
    formatdict = {}
@@ -100,8 +63,9 @@ def main():
    formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
    formatYelFill=PatternFill("solid", fgColor='222200')
    formatGryFill=PatternFill("solid", fgColor='888888')
-   formatsDict={'UNABLE\nDETERMINE\nVALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED IN':formatMusFill}
-   #grnFill = NamedStyle(name='grnFill')
+   formatsDictX={'UNABLE\nDETERMINE\nVALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED IN':formatMusFill}
+
+   formatsDict={'CORRECT':formatGrnFill, 'CURATED':formatYelFill,'FILLED IN':formatMusFill, 'UNABLE CURATE':formatRedFill,' UNABLE\nDETERMINE\nVALIDITY':formatGryFill}
   
    wb = Workbook()
    ws = wb.active
@@ -200,19 +164,20 @@ def main():
 
    thin = Side(border_style="thin", color="000000")
    border = Border(top=thin, left=thin, right=thin, bottom=thin)
-   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="BBBBBB")]
+  # theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="BBBBBB")]
+   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="BBBBBB")]
    font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="top", wrap_text=True)
 
+   
    j=0
    for col in range(1+origincol,1+origincol+len(formatsDict)):
       colname = get_column_letter(col)
       yy = formatsDict.keys()[col-origincol-1]
 #      zz = formatsDict.get(yy)
       print(col-origincol)
-      print("L213 4-j=",4-j)
-      theFill = theFills[4-j]
-#      print("theFill=", theFill)
+      theFill = theFills[j]
+      print("L179 j=",j, "theFill=", theFill)
       j = j+1
       for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
