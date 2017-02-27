@@ -12,14 +12,13 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-26T18:43:14-0500"
+__version__ = "OutcomeFormats.py 2017-02-26T19:224:28-0500"
 
 import json
 import sys
 from openpyxl.styles import NamedStyle, PatternFill, Fill, Border, Side, Alignment, Protection, Font, GradientFill, Alignment
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-#from OpenpyxlStyle import style_range
 from FormatUtils import style_range
 import argparse
 
@@ -42,7 +41,7 @@ class OutcomeFormats:
       formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
       formatRedFill=PatternFill("solid", fgColor='FF0000')
       formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
-      formatYelFill=PatternFill("solid", fgColor='FFFF00')
+      formatYelFill=PatternFill("solid", fgColor='DDDD00')
       formatGryFill=PatternFill("solid", fgColor='888888')
 
 
@@ -54,19 +53,24 @@ class OutcomeFormats:
 
       return self.formats
 def main():
+   from collections import OrderedDict
    print("OutcomeFormats.main()")
-   formatdict = {}
-   frm = OutcomeFormats(formatdict)
-   formats = frm.initFormats(formatdict)
+   theformatdict = {}
+   frm = OutcomeFormats(theformatdict)
+   formats = frm.initFormats(theformatdict)
+   print("L61 tormats type=", type(formats))
+   outcomeDict = OrderedDict(sorted(formats.items(),key=lambda t: t[0]))
    formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
    formatRedFill=PatternFill("solid", fgColor='FF0000')
    formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
    formatYelFill=PatternFill("solid", fgColor='222200')
    formatGryFill=PatternFill("solid", fgColor='888888')
-   formatsDictX={'UNABLE\nDETERMINE\nVALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED IN':formatMusFill}
+#   formatDict = OrderedDict(sorted(theformatdict.items(),key=lambda t: t[0]))
+   print("L67 outComeDictKeys=", outcomeDict.keys())
 
-   formatsDict={'CORRECT':formatGrnFill, 'CURATED':formatYelFill,'FILLED IN':formatMusFill, 'UNABLE CURATE':formatRedFill,' UNABLE\nDETERMINE\nVALIDITY':formatGryFill}
-  
+   theDict = {'CORRECT':formatGrnFill, 'CURATED':formatYelFill,'FILLED IN':formatMusFill, 'UNABLE CURATE':formatRedFill,'UNABLE DETERMINE VALIDITY':formatGryFill}
+   formatsDict = OrderedDict(sorted(theDict.items(),key=lambda t: t[0]))
+   print("L69 formatsDictKeys=", formatsDict.keys())
    wb = Workbook()
    ws = wb.active
    originrow = 4
@@ -164,7 +168,6 @@ def main():
 
    thin = Side(border_style="thin", color="000000")
    border = Border(top=thin, left=thin, right=thin, bottom=thin)
-  # theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="BBBBBB")]
    theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="BBBBBB")]
    font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="top", wrap_text=True)
@@ -177,7 +180,7 @@ def main():
 #      zz = formatsDict.get(yy)
       print(col-origincol)
       theFill = theFills[j]
-      print("L179 j=",j, "theFill=", theFill)
+#      print("L179 j=",j, "theFill=", theFill)
       j = j+1
       for row in range(1+originrow,1+originrow+numvalidators):
          cellname = colname+str(row)
