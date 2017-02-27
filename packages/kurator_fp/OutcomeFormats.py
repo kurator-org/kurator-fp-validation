@@ -12,15 +12,17 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeFormats.py 2017-02-26T19:224:28-0500"
+__version__ = "OutcomeFormats.py 2017-02-27T10:51:47-0500"
 
 import json
 import sys
+from collections import OrderedDict
+import argparse
+
 from openpyxl.styles import NamedStyle, PatternFill, Fill, Border, Side, Alignment, Protection, Font, GradientFill, Alignment
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from FormatUtils import style_range
-import argparse
 
 class OutcomeFormats:
    """Class supporting xlsx cell formats for a set of Kurator Quality Control *outcomes*
@@ -53,12 +55,11 @@ class OutcomeFormats:
 
       return self.formats
 def main():
-   from collections import OrderedDict
    print("OutcomeFormats.main()")
    theformatdict = {}
    frm = OutcomeFormats(theformatdict)
    formats = frm.initFormats(theformatdict)
-   print("L61 tormats type=", type(formats))
+#   print("L61 formats type=", type(formats))
    outcomeDict = OrderedDict(sorted(formats.items(),key=lambda t: t[0]))
    formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
    formatRedFill=PatternFill("solid", fgColor='FF0000')
@@ -66,11 +67,11 @@ def main():
    formatYelFill=PatternFill("solid", fgColor='222200')
    formatGryFill=PatternFill("solid", fgColor='888888')
 #   formatDict = OrderedDict(sorted(theformatdict.items(),key=lambda t: t[0]))
-   print("L67 outComeDictKeys=", outcomeDict.keys())
+#   print("L67 outComeDictKeys=", outcomeDict.keys())
 
-   theDict = {'CORRECT':formatGrnFill, 'CURATED':formatYelFill,'FILLED IN':formatMusFill, 'UNABLE CURATE':formatRedFill,'UNABLE DETERMINE VALIDITY':formatGryFill}
+   theDict = {'CORRECT':formatGrnFill, 'CURATED':formatYelFill,'FILLED IN':formatMusFill, 'UNABLE CURATE':formatRedFill,'UNABLE\nDETERMINE\nVALIDITY':formatGryFill}
    formatsDict = OrderedDict(sorted(theDict.items(),key=lambda t: t[0]))
-   print("L69 formatsDictKeys=", formatsDict.keys())
+#   print("L69 formatsDictKeys=", formatsDict.keys())
    wb = Workbook()
    ws = wb.active
    originrow = 4
@@ -94,91 +95,90 @@ def main():
    
 
    
+
+    ############################################
+    # set kurator outcome names as headers     #
+    ############################################
    outcomeIndex = 0
-
-   # set outcome names as headers 
-   #
-
-#   font = Font(bold=True)
    for col in range(1, 1+fdictlen):
       value = theOutcomes[outcomeIndex]
       cell = ws.cell(column=col+origincol, row=originrow, value=value)
       thecol=col+origincol
       thecolletter = get_column_letter(thecol)
-      print("L139 value = ", value, "thecolletter=",thecolletter, "col=", col, "cell=", cell)
+#      print("L139 value = ", value, "thecolletter=",thecolletter, "col=", col, "cell=", cell)
 #      cell.style.alignment.wrap_text = True
       cell.font = Font(bold=True)
       outcomeIndex += 1
 
-      #set column width based on length of column header text
-      #which is taken from outcome names
-   dims = {}
+   ##########################################################
+   # set column width based on length of column header text #
+   # which is taken from outcome names                      #
+   ##########################################################   
+   colwidthDict = {}
    emwidth = 12 #for now
-##   for row in ws.rows:
-##      for cell in row:
-##        if cell.value:
-##            dims[cell.column] = emwidth + max((dims.get(cell.column, 0), len(cell.value)))
-        #    print ("L92", cell.value, dims[cell.column])
-#   maxcolwidth = max(dims.keys())
-   ww = dims
+   for row in ws.rows:
+      for cell in row:
+        if cell.value:
+            colwidthDict[cell.column] = emwidth + max((colwidthDict.get(cell.column, 0), len(cell.value)))
+#            print ("L92", cell.value, colwidthDict[cell.column])
+   maxcolwidth = max(colwidthDict.keys())
+   ww = colwidthDict
+   alignment=Alignment(horizontal='general',
+                       vertical='top',
+                       text_rotation=0,
+                       wrap_text=True,
+                       shrink_to_fit=False,
+                       indent=0)
    maxwidth = 0
-   print("L149=",ww)
-#   alignment=Alignment(horizontal='general',
-#                       vertical='top',
-#                       text_rotation=0,
-#                       wrap_text=True,
-#                       shrink_to_fit=False,
-#                       indent=0)
-   for col, value in dims.items():
-      ws.column_dimensions[col].width = value
+   for col, value in colwidthDict.items():
+      tt = ws.column_dimensions[col].width = 16 #value
       if value > maxwidth :
          maxwidth = value
-      print("L150 maxwidth=",maxwidth)
    for row in ws.rows:
-#      for cell in row:
       for outcomename in row:
         if outcomename.value:
-            dims[outcomename.column] = emwidth + maxwidth
-#            cell.style.alignment.wrap_text = True
-            
-#            print("L161 outcomename= ",outcomename.value)
+            cc = colwidthDict[outcomename.column] = emwidth + maxwidth
+#            print("L142= outcomename=",outcomename, "cc=",cc)
 
 
-   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output. should get from args
-   numvalidators = len(validators)
+   ##########################################################
+   # make validator column from validator names           ###
+   # providing space for longest name                     ###
+   ##########################################################
+   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in desired output. should get from app args
+   numvalidators = len(validators) #number of data rows, one for each validator
    row = 1+originrow
- #  print(validators[row])
-
-#   d=ws.cell(row=row, col=0, value=validators[row])
-   i = 0
-   col = 0
-
    maxValidatorLen = len(max(validators))
-   print(maxValidatorLen)
    for i in range(0,numvalidators):
-#      print(validators[row])
       value = validators[i]
       ws.cell(row=i+originrow+1, column=origincol, value=value)
    
-   validatorCol = get_column_letter(origincol)
-   print(validatorCol)
-   ws.column_dimensions[validatorCol].width = maxValidatorLen
+   validatorCol = get_column_letter(origincol) #get column name id spreadsheet form
+   ws.column_dimensions[validatorCol].width = maxValidatorLen #long enough for longest name
      
-      # make cell color extracted from outcome index
-
+      #################################################
+      # height of name row. Tricky in openpyxl        #
+      # so use a typographically reasonable constant. #
+      # Should document the typography more.          #
+      #################################################
+   ws.row_dimensions[originrow].height = 3*emwidth+12 #
+   
+      ###########################################################
+      # provide openpyxl styles which are constant on the parts #
+      # where data will go                                      #
+      ###########################################################      
    thin = Side(border_style="thin", color="000000")
    border = Border(top=thin, left=thin, right=thin, bottom=thin)
-   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="BBBBBB")]
    font = Font(b=True, color="000000")
    al = Alignment(horizontal="center", vertical="top", wrap_text=True)
 
-   
+      ###########################################################
+      # make cell color extracted from outcome index            #
+      ###########################################################      
+   theFills = [PatternFill("solid", fgColor="00FF00"), PatternFill("solid", fgColor="FFFF00"), PatternFill("solid", fgColor="DDDD00"), PatternFill("solid", fgColor="FF0000"), PatternFill("solid", fgColor="BBBBBB")]
    j=0
    for col in range(1+origincol,1+origincol+len(formatsDict)):
       colname = get_column_letter(col)
-      yy = formatsDict.keys()[col-origincol-1]
-#      zz = formatsDict.get(yy)
-      print(col-origincol)
       theFill = theFills[j]
 #      print("L179 j=",j, "theFill=", theFill)
       j = j+1
@@ -186,22 +186,10 @@ def main():
          cellname = colname+str(row)
          theRange=cellname+":"+cellname
          theCell = ws[cellname]
+            ### commit style via style_range(...)
          style_range(ws,theRange,border=border, fill=theFill, font=font, alignment=al)
-
-   
 
    wb.save("outcomestyled.xlsx")
    
 if __name__ == "__main__" :
    main()
-
-"""
-      formatGrnFill=PatternFill("solid", fgColor='00FF00') #lite green
-      formatRedFill=PatternFill("solid", fgColor='FF0000')
-      formatMusFill=PatternFill("solid", fgColor='DDDD00') #mustard
-      formatYelFill=PatternFill("solid", fgColor='FFFF00')
-      formatGryFill=PatternFill("solid", fgColor='888888') 
-      formatXFill=''
-      #next make a dict out of the set of openpyxl styles
-      self.formats={'UNABLE_DETERMINE_VALIDITY':formatGryFill, 'CURATED':formatYelFill, 'UNABLE_CURATE':formatRedFill, 'CORRECT':formatGrnFill, 'FILLED_IN':formatMusFill}
-"""
