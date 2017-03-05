@@ -1,14 +1,15 @@
 import argparse
 
 class Args :
-   def __init__(self, infile, outfile, configFile):
+#   def __init__(self, infile, outfile, configFile):
+   def __init__(self, configFile):   
       self.parser = argparse.ArgumentParser()
-      self.parser.add_argument('--i',default='occurrence_qc.json', help="Defaults to occurrence_qc.json if '--i' absent")
-      self.parser.add_argument('--o',default='outcomeStats.xlsx', help="Defaults to outcomeStats.xlsx if '--o' absent")
+#      self.parser.add_argument('--i',default='occurrence_qc.json', help="Defaults to occurrence_qc.json if '--i' absent")
+#      self.parser.add_argument('--o',default='outcomeStats.xlsx', help="Defaults to outcomeStats.xlsx if '--o' absent")
       self.parser.add_argument('--c',default='stats.ini', help="Defaults to stats.ini if --c absent")
       self.args = self.parser.parse_args()
-      self.infile = infile
-      self.outfile = outfile
+ #     self.infile = infile
+#      self.outfile = outfile
       self.configFile = configFile
       
    def getArgs(self):

@@ -12,11 +12,12 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-04T10:28:51-05:00"
+__version__ = "OutcomeStats.py 2017-03-04T15:02:17-05:00"
 
 import json
 import configparser
-import Args
+import argparse
+#import Args
 
 class OutcomeStats:
    def __init__(self, dict):
@@ -90,8 +91,19 @@ class OutcomeStats:
    
    
 def main():
-   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
-   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") 
+   from Args import Args
+ #  args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
+   args = Args('stats.ini')
+   parser = argparse.ArgumentParser(description='Stats arguments')
+   config = configparser.ConfigParser()
+   config.sections()
+   configFile = args.getConfigfile()
+   configFile='stats.ini'
+   config.read(configFile)
+   validators =eval( config['DEFAULT']['validators'])
+#   maxlength= max(len(s) for s in validators)
+   outcomes = eval(config['DEFAULT']['outcomes'])
+
    infile = 'occurrence_qc.json' #FPAkka postprocessor output
 
    dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes} 
