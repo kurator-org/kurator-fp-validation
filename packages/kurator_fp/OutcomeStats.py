@@ -12,12 +12,14 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-04T22:05:21-05:00"
+__version__ = "OutcomeStats.py 2017-03-07T16:30:03-05:00"
 
 import json
 import configparser
 import argparse
-#import Args
+from Args import Args #local file Args.py
+from actor_decorator import python_actor
+from collections import OrderedDict
 
 class OutcomeStats:
    def __init__(self, dict):
@@ -89,8 +91,9 @@ class OutcomeStats:
       return stats
    
    
-   
-def main():
+#@python_actor
+   #return the outcome stats as a python dictionary
+def outcomestatsOnData(optdict):
    from Args import Args
  #  args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
    args = Args('stats.ini')
@@ -113,6 +116,12 @@ def main():
 
       # return theStats as a Dict
    theStats = outcomestats.createStats(fpa, normalize)
-   print("L112 theStats=", theStats)
+   return theStats
+ #  print("L112 theStats=", theStats)
+
+def main():
+   optdict = {}
+   stats = outcomestatsOnData(optdict)
+   print(stats)
 if __name__ == '__main__':
    main()
