@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-07T16:30:03-05:00"
+__version__ = "OutcomeStats.py 2017-03-08T21:40:33-05:00"
 
 import json
 import configparser
@@ -24,6 +24,7 @@ from collections import OrderedDict
 class OutcomeStats:
    def __init__(self, dict):
      self.dict= dict
+#     print(self.dict)
      infile = dict.get('infile')
            # convert fpAkka post processor json to python dict
      with open(infile) as data_file:
@@ -48,14 +49,20 @@ class OutcomeStats:
 
    def initStats(self,outcomes) :
       stats = {}
+#      stats = OrderedDict()
       for outcome in outcomes:
           stats[outcome] = 0
+#      print("L55 stats=", stats)
       return stats
    
    def initValidatorStats(self,validators, outcomes) :
       stats = {}
+#      stats= OrderedDict(sorted(validators.items(), key=lambda t: t[0]))
+  #    stats = OrderedDict()
+   #   print(validators)
       for v in validators :
          stats[v] = self.initStats(outcomes)
+   #   print("L65 stats.items()=", stats.items(), "validators=", validators)
       return stats
    
    def updateValidatorStats(self,fpa, stats, record)  :
@@ -91,7 +98,7 @@ class OutcomeStats:
       return stats
    
    
-#@python_actor
+@python_actor
    #return the outcome stats as a python dictionary
 def outcomestatsOnData(optdict):
    from Args import Args
@@ -116,12 +123,14 @@ def outcomestatsOnData(optdict):
 
       # return theStats as a Dict
    theStats = outcomestats.createStats(fpa, normalize)
+   print("L127 theStats=", theStats)
    return theStats
- #  print("L112 theStats=", theStats)
+
 
 def main():
-   optdict = {}
+   optdict = {'inputfile':'occurrence_qc.json', }
    stats = outcomestatsOnData(optdict)
-   print(stats)
+   print("L133 stats=",stats)
+#   print("L133 stats=",stats, "type=",type(stats))
 if __name__ == '__main__':
    main()
