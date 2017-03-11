@@ -12,43 +12,34 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-01-30T16:03:54-0500"
-
-from actor_decorator import python_actor
-from OutcomeFormats import *
+__version__ = "OutcomeStats.py 2017-03-10T22:15:31-05:00"
 
 import json
-import xlsxwriter
 import configparser
-import Args
+import argparse
+#from Args import Args #local file Args.py
+from actor_decorator import python_actor
+from collections import OrderedDict
 
 class OutcomeStats:
-#   def __init__(self, workbook, worksheet,infile, outfile, configFile, origin1, origin2):
-   def __init__(self, configfile):
+   def __init__(self, dict):
+     self.dict= dict
+#     print(self.dict)
+     infile = dict.get('infile')
+           # convert fpAkka post processor json to python dict
+     with open(infile) as data_file:
+        fpa=json.load(data_file) #python form of fpAkka post processor json
+     self.validators = dict.get('validators')
+     self.outcomes = dict.get('outcomes')
+   #   print("outcomes=", outcomes)
 
-      #with open(args.getInfile()) as data_file:
-      #           fpAkkOutput=json.load(data_file)
+     dict['fpa'] = fpa
+     #print('fpa=',fpa)
+        # return self.fpa
 
-      #with open(args.getInfile()) as data_file:
-      #   self.fpa=json.load(data_file)
-
-      config = configparser.ConfigParser()
-      config.sections()
-#      self.configFile =configFile
-      self.configFile = configfile
-#      self.configFile='stats.ini'
-      config.read(self.configFile)
-      self.validators =eval( config['DEFAULT']['validators'])
-      self.maxlength= max(len(s) for s in self.validators)
-      self.outcomes = eval(config['DEFAULT']['outcomes'])
-      self.max1= max(len(s) for s in self.validators)
-      self.max2= max(len(t) for t in self.outcomes)
-      self.maxlength = max(self.max1,self.max2)
-      #self.fpa = {}
-      #infile = 'occurrence_qc.json' #for now
-
-      #self.numRecords = len(self.fpa)
-
+   def getDict(self) :
+      return self.dict
+   
    def getOutcomes(self) :
       return self.outcomes
    def getValidators(self) :
@@ -58,19 +49,24 @@ class OutcomeStats:
 
    def initStats(self,outcomes) :
       stats = {}
+#      stats = OrderedDict()
       for outcome in outcomes:
           stats[outcome] = 0
+#      print("L55 stats=", stats)
       return stats
    
    def initValidatorStats(self,validators, outcomes) :
       stats = {}
+#      stats= OrderedDict(sorted(validators.items(), key=lambda t: t[0]))
+  #    stats = OrderedDict()
+   #   print(validators)
       for v in validators :
          stats[v] = self.initStats(outcomes)
+   #   print("L65 stats.items()=", stats.items(), "validators=", validators)
       return stats
    
    def updateValidatorStats(self,fpa, stats, record)  :
       data=fpa[record]["Markers"]
-   #   print("in updateValidatorStats[",record,"]")
       for data_k, data_v in data.items() :
          for stats_k, stats_v in stats.items() :
             if (stats_k == data_k):
@@ -101,130 +97,42 @@ class OutcomeStats:
    #   print("in normalize stats=",stats)
       return stats
    
-   def stats2CSV(self, stats, outfile, outcomes, validators):
-      import csv
-      with open(outfile, 'w') as csvfile:
-         o=list(outcomes)
-         o.insert(0,"Validator")
-         fieldnames=tuple(o)
-         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-         writer.writeheader()
-         for v in validators:
-            row = stats[v]
-            row['Validator'] = v
-            writer.writerow(row)
    
-   def initWorkbook(outfile):
-      """
-      Returns a workbook to be written to **outfile**
-      """
-      workbook = xlsxwriter.Workbook(outfile)
-      return workbook
+#@python_actor
+   #return the outcome stats as a python dictionary
+def outcomestatsOnData(optdict):
+   from Args import Args
+ #  args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
+#   args = Args('stats.ini')
+###   parser = argparse.ArgumentParser(description='Stats arguments')
+###   config = configparser.ConfigParser()
+###   config.sections()
+###   configFile = args.getConfigfile()
+###   configFile='stats.ini'
+###   config.read(configFile)
+###   validators =eval( config['DEFAULT']['validators'])
+#   maxlength= max(len(s) for s in validators)
+###   outcomes = eval(config['DEFAULT']['outcomes'])
    
-   #doesn't belong in this class
-   
-   def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
-   #   print("fmts=",formats)
-      bold = workbook.add_format({'bold': True})
-   #   print("stats=",stats)
-   #   print("outcomes=", outcomes)
-      print('origin=',origin)
-      headRow = origin[0]
-      headCol = origin[1]
-      
-      worksheet.write(headRow ,headCol,"Validator",bold)
-      for str in outcomes :
-         col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
-         worksheet.write(headRow,col, str, bold) #write col header
+   infile = 'occurrence_qc.json' #FPAkka postprocessor output
+   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
+   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
 
-      for k, v in stats.items():
-         col = headCol;
- ###        print("at L137 key=",k,"val=", v, "thecol=",col)
-         row = 1+headRow+validators.index(k) #put rows in order of the validators list
-         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
-   #      print("row=",row)
-###         worksheet.write(row,0,k) #write validator name
-         worksheet.write(row,col,k) #write validator name
-         #write data for each validator in its own row
-         for outcome, statval in v.items():
-            col = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
-            worksheet.write(row, col, statval,formats.get(outcome))
+   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes} 
+   outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python 
+   fpa = outcomestats.getDict()['fpa'] 
+   normalize = False
 
-#def main():
-#   from Args import Args
-#   print("OutcomeStats.main()")
-#   print(type(self.outcomeFormats()))
-#   args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
-#   workbook = xlsxwriter.Workbook(args.getOutfile())
-#   worksheet = workbook.add_worksheet()
-#   ocol = 3
-#   orow = 8
-   
-#   origin1 = [orow,ocol]
-#   origin2 = [5,0]
-
-#   stats=OutcomeStats(args)
-
-@python_actor
-###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
-def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
-   # load entire jason file. (Note: syntactically it is a Dictionary !!! )
-   with open(inputfile) as data_file:
-      fpAkkaOutput = json.load(data_file)
-
-      ###### In this test, both normalized and non-normalized statistics are shown
-   ###    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-   ###    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-
-   ###    origin1 = [origincolumn,originrow]
-   origin1 = [origincolumn,originrow]
-   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
-   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
-   #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
-   stats = OutcomeStats(configfile)
-   ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   #   print(stats.getOutcomes())
-   outcomeFormats = OutcomeFormats({})
-   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
-   ###################################################
-   #####createStats and stats2XLSX comprise the main #
-   # processor filling the spreadheet cells       ####
-   ###################################################
-   # if stats are normalized, results are divided by number of records
-   # otherwise, cells show total of the number of each outcome in the appropriate column
-   normalized = True
-   validatorStats = stats.createStats(fpAkkaOutput, ~normalized)
-   validatorStatsNormalized = stats.createStats(fpAkkaOutput, normalized)
-
-   outcomes = stats.getOutcomes()
-   #   print("outcomes=", outcomes)
-   validators = stats.getValidators()
-   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
-   ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
-
-   workbook.close()
+      # return theStats as a Dict
+   theStats = outcomestats.createStats(fpa, normalize)
+   print("L127 theStats=", theStats)
+   return theStats
 
 
 def main():
-   optdict = {}
-
-   ocol = 4
-   orow = 8
-
-   optdict['inputfile'] = './data/occurrence_qc.json'
-   optdict['outputfile'] = 'outcomeStats.xlsx'
-   optdict['workspace'] = './'
-   optdict['configfile'] = './config/stats.ini'
-   optdict['loglevel'] = 'DEBUG'
-   optdict['origincolumn'] = ocol
-   optdict['originrow'] = orow
-   print ('optdict: %s' % optdict)
-
-   # Append distinct values of to vocab file
-   response=outcomestats(optdict)
-   print ('\nresponse: %s' % response)
-
+   optdict = {'inputfile':'occurrence_qc.json', }
+   stats = outcomestatsOnData(optdict)
+   print("L133 stats=",stats)
+#   print("L133 stats=",stats, "type=",type(stats))
 if __name__ == '__main__':
    main()
