@@ -31,17 +31,20 @@ class OutcomeStats:
      infile = dict.get('infile')
            # convert fpAkka post processor json to python dict
      with open(infile) as data_file:
-        fpa=json.load(data_file) #python form of fpAkka post processor json
+        self.fpa=json.load(data_file) #python form of fpAkka post processor json
      self.validators = dict.get('validators')
      self.outcomes = dict.get('outcomes')
 #     print("L36 outcomes=", self.outcomes, "validators=", self.validators)
 
-     dict['fpa'] = fpa
+    # fpa = dict['fpa']
     # return fpa
  #    print("L37 outcomes=", self.outcomes, "validators=", self.validators)     
      #print('fpa=',fpa)
         # return self.fpa
 
+   def getFpa(self) :
+      return self.fpa
+   
    def getDict(self) :
       return self.dict
    
@@ -62,53 +65,26 @@ class OutcomeStats:
       return stats
    
 
-
-  ### def initValidatorStats(self,validators, outcomes) :
-##      stats = np.zeros((len(validators), len(outcomes)))
-##      bp.breakpoint("L69 in initValidatorStats stats=",stats, True)
-##      for v in validators :
-##         stats[v] = self.initStats(validators, outcomes) #already wrong here
-##      return stats
+def initValidatorStats(validators, outcomes) :
+      stats = np.zeros((len(validators), len(outcomes)))
+      bp.breakpoint("L69 in initValidatorStats stats=",stats, True)
+#      for v in validators :
+#         stats[v] = self.initStats(validators, outcomes) #already wrong here
+      return stats
    
-   
-   #typed parameter requires python3
-def xfillStats(fpa, normalize=False):
-      print("L88")
-      validatorStats = initValidatorStats(validators, outcomes) #already wrong
-      print("L78 validatorStats=", validatorStats)
-      sys.exit()
-      for record in range(len(fpa)):
-         updateValidatorStats(fpa, validatorStats, record) 
-      if normalize == True :
-         normalizeStats(fpa,validatorStats)
-      return validatorStats
 
-def fillStats(fpa, normalize=False):
+def fillStats(fpa, stats, validators, outcomes):
      # print("L88")
-      validatorStats = initValidatorStats(validators, outcomes) #already wrong
-      print("L78 validatorStats=", validatorStats)
-      sys.exit()
+#      validatorStats = initValidatorStats(validators, outcomes) #already wrong
+      print("L78 stats=", stats)
+#      sys.exit()
       for record in range(len(fpa)):
-         updateValidatorStats(fpa, validatorStats, record) 
-      if normalize == True :
-         normalizeStats(fpa,validatorStats)
-      return validatorStats
-   
-def normalizeStats(fpa,stats):
-      #fpa is dict loaded from FP-Akka json output
-      #divide outcome counts by occurrence counts
-   count=len(fpa)
-   count_f= float(count)
-   #   if (count <= 0) return(-1)
-   for validator,outcomes in stats.items():
-      stat=stats[validator]
-      for k,v in stat.items():
-         v = v/count_f
-         stat[k] = format(v, '.4f')
-   return stats
+         updateValidatorStats(fpa, stats, validators, outcomes, record) 
+      return stats
    
 def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
-   print("L100 stats=",stats)
+#   print("L111 stats=",stats)
+   print("L94 in updateValidatorStats called by outcomeStatsOnData")
 #   sys.exit()
    data=fpa[record]["Markers"]
 #   print("L114 data=",data, "validators=", validators, "outcomes=", outcomes)
@@ -117,13 +93,26 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
       validator = validators[i]
       outcome = data.get(validator)
       outcomeIndex = outcomes.index(outcome)
-      print("i= ", i, "validator=",validator, "outcome=", outcome, "outcomeIndex=", outcomeIndex)
-   sys.exit()
+      validatorIndex = validators.index(validator) # that is i
+     # print("i= ", i, "validator=",validator, "outcome=", outcome, "outcomeIndex=", outcomeIndex)
+      #row = validators.index(validator)
+      # row = i, col = outcomeIndex
+#      print("Line 106 in updateValidatorStats:", i,outcomeIndex)
+      z=np.zeros((len(validators), len(outcomes)), dtype=np.int32) #constant?
+      z.itemset((i,outcomeIndex),1)
+#      print("L109 in updateValidatorStats z=",z)
+      stats  = stats+z
+#      print ("L111 stats on next record=",stats)
+#      bp.breakpoint("At data eval", stats, False)
+  # print(stats)
+  # sys.exit()
 #   for data_k, data_v in data.items() :
-#      for stats_k, stats_v in stats.items() :
+#      for stats_k, stats_v in stats: #stats.items() :
 #         if (stats_k == data_k):
 #            stats[stats_k][data_v] += 1
-   bp.breakpoint("At end of updateValidatorStats() stats=", stats, True)
+#   bp.breakpoint("At end of updateValidatorStats() stats=", stats, False)
+#   print ("L120 stats on next record=",stats)
+#   sys.exit()
    return stats
 
    
@@ -158,23 +147,36 @@ def outcomestatsOnData(optdict):
 
       # return theStats as a Dict
    aaa = OutcomeStats(dict)
-#   theStats = outcomestats.createStats(fpa, normalize)
-   theStats = aaa.initStats(validators, outcomes)
+#   stats = outcomestats.createStats(fpa, normalize)
+   stats = aaa.initStats(validators, outcomes)
        #now fill
+   #print("in OutcomeStatsOnData L150 about to call updateValidatorStats loop on  ", len(fpa), "records")
    for record in range(len(fpa)):
-         updateValidatorStats(fpa, theStats,validators, outcomes, record) 
+         updateValidatorStats(fpa, stats,validators, outcomes, record) 
 
-   print("L143 theSats=", theStats)
-   sys.exit()
-   #updateValidatorStats(fpa, theStats, record) 
-   theStats = fillStats(fpa,theStats,  normalize=False)
-   return theStats
+   print("L160 stats=", stats)
+  # sys.exit()
+   #updateValidatorStats(fpa, theStats, record)
+#   stats = fillStats(fpa,stats,validators, outcomes)
+   return stats
 
 
 def main():
    optdict = {'inputfile':'occurrence_qc.json', }
-   stats = outcomestatsOnData(optdict)
-   bp.breakpoint("In main() stats=", stats, True)
+#   stats = outcomestatsOnData(optdict)
+   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
+   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
+   stats = np.zeros((len(validators), len(outcomes)))
+   infile = optdict.get('inputfile')
+   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
+#   print("L123 dict[validators]=",dict['validators'])
+   outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python
+   fpa = outcomestats.getFpa()
+   print("fpa=",fpa)
+#   stats = updateValidatorStats(fpa, stats, validators, outcomes, record)
+   stats = fillStats(fpa, stats, validators, outcomes)
+   print("in main, stats=", stats)
+ #  bp.breakpoint("In main() stats=", stats, False)
    
 
 if __name__ == '__main__':
