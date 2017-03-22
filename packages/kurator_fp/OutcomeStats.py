@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-13T21:45:08-04:00"
+__version__ = "OutcomeStats.py 2017-03-20T21:54:18-04:00"
 
 import json
 import configparser
@@ -24,7 +24,7 @@ import numpy as np
 import sys
 import BreakPoint as bp
 
-class OutcomeStats:
+class XOutcomeStats:
    def __init__(self, dict):
      self.dict= dict
 #     print(self.dict)
@@ -63,9 +63,17 @@ class OutcomeStats:
     #      print("L55 outcome=",outcome, "stats=", stats)
 #      sys.exit()
       return stats
-   
 
-def initValidatorStats(validators, outcomes) :
+def startup(dict) :
+      infile = dict.get('inputfile')
+           # convert fpAkka post processor json to python dict
+      with open(infile) as data_file:
+        fpa=json.load(data_file) #python form of fpAkka post processor json
+#      validators = dict.get('validators')
+#      outcomes = dict.get('outcomes')
+      return fpa   #making a copy??? OK???
+
+def XinitValidatorStats(validators, outcomes) :
       stats = np.zeros((len(validators), len(outcomes)))
       bp.breakpoint("L69 in initValidatorStats stats=",stats, True)
 #      for v in validators :
@@ -73,18 +81,10 @@ def initValidatorStats(validators, outcomes) :
       return stats
    
 
-def fillStats(fpa, stats, validators, outcomes):
-     # print("L88")
-#      validatorStats = initValidatorStats(validators, outcomes) #already wrong
-      print("L78 stats=", stats)
-#      sys.exit()
-      for record in range(len(fpa)):
-         updateValidatorStats(fpa, stats, validators, outcomes, record) 
-      return stats
-   
 def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
 #   print("L111 stats=",stats)
-   print("L94 in updateValidatorStats called by outcomeStatsOnData")
+ #  print("L94 in updateValidatorStats called by outcomeStatsOnData")
+   print("L96 stats in=", stats)
 #   sys.exit()
    data=fpa[record]["Markers"]
 #   print("L114 data=",data, "validators=", validators, "outcomes=", outcomes)
@@ -111,31 +111,11 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
 #         if (stats_k == data_k):
 #            stats[stats_k][data_v] += 1
 #   bp.breakpoint("At end of updateValidatorStats() stats=", stats, False)
-#   print ("L120 stats on next record=",stats)
+   print ("L120 stats out on next record=",stats)
 #   sys.exit()
    return stats
 
    
-#@python_actor
-   #return the outcome stats as a python dictionary
-def outcomestatsOnData(optdict):
-   from Args import Args
- #  args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
-#   args = Args('stats.ini')
-###   parser = argparse.ArgumentParser(description='Stats arguments')
-###   config = configparser.ConfigParser()
-###   config.sections()
-###   configFile = args.getConfigfile()
-###   configFile='stats.ini'
-###   config.read(configFile)
-###   validators =eval( config['DEFAULT']['validators'])
-#   maxlength= max(len(s) for s in validators)
-###   outcomes = eval(config['DEFAULT']['outcomes'])
-   
-   infile = 'occurrence_qc.json' #FPAkka postprocessor output
-   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
-   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
-
    dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
 #   print("L123 dict[validators]=",dict['validators'])
    outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python
@@ -151,8 +131,8 @@ def outcomestatsOnData(optdict):
    stats = aaa.initStats(validators, outcomes)
        #now fill
    #print("in OutcomeStatsOnData L150 about to call updateValidatorStats loop on  ", len(fpa), "records")
-   for record in range(len(fpa)):
-         updateValidatorStats(fpa, stats,validators, outcomes, record) 
+#   for record in range(len(fpa)):
+#         updateValidatorStats(fpa, stats,validators, outcomes, record) 
 
    print("L160 stats=", stats)
   # sys.exit()
@@ -162,7 +142,7 @@ def outcomestatsOnData(optdict):
 
 
 def main():
-   optdict = {'inputfile':'occurrence_qc.json', }
+   optdict = {'inputfile':'occurrence_qc.json' }
 #   stats = outcomestatsOnData(optdict)
    validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
@@ -170,11 +150,14 @@ def main():
    infile = optdict.get('inputfile')
    dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
 #   print("L123 dict[validators]=",dict['validators'])
-   outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python
-   fpa = outcomestats.getFpa()
-   print("fpa=",fpa)
+#   outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python
+   fpa = startup(optdict)
+   for record in range(len(fpa)):
+         stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
+#   print("fpa=",fpa)
+#   sys.exit()
 #   stats = updateValidatorStats(fpa, stats, validators, outcomes, record)
-   stats = fillStats(fpa, stats, validators, outcomes)
+#   stats = fillStats(fpa, stats, validators, outcomes)
    print("in main, stats=", stats)
  #  bp.breakpoint("In main() stats=", stats, False)
    
