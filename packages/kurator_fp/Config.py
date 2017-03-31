@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "Config.py 2017-03-25T15:55:59-04:00"
+__version__ = "Config.py 2017-03-28T22:57:24-04:00"
 
 import sys
 import ConfigParser
