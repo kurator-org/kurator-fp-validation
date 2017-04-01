@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-25T09:53:53-04:00"
+__version__ = "OutcomeStats.py 2017-03-31T23:15:04-04:00"
 
 import json
 import configparser
@@ -28,46 +28,37 @@ def startup(dict) :
            # convert fpAkka post processor json to python dict
       with open(infile) as data_file:
         fpa=json.load(data_file) #python form of fpAkka post processor json
-#      validators = dict.get('validators')
-#      outcomes = dict.get('outcomes')
       return fpa   #making a copy??? OK???
 
    
 
 def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
-#   print("L40 stats in=", stats)
    data=fpa[record]["Markers"]
    for i in range(len(validators)) :
       validator = validators[i]
       outcome = data.get(validator)
       outcomeIndex = outcomes.index(outcome)
       validatorIndex = validators.index(validator) 
-      #row = validators.index(validator)
-      # row = i, col = outcomeIndex
       z=np.zeros((len(validators), len(outcomes)), dtype=np.int32) #constant?
       z.itemset((i,outcomeIndex),1)
       stats  = stats+z
-#   print ("L120 stats out on next record=",stats)
    return stats
    
   
 
 def main():
+   import Config
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
    optdict = {'inputfile':'occurrence_qc.json' }
-   validators = ("ScientificNameValidator","DateValidator",  "GeoRefValidator","BasisOfRecordValidator") #row order in output
-   outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE") #col order in output
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
    infile = optdict.get('inputfile')
-   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
-#   print("L123 dict[validators]=",dict['validators'])
-#   outcomestats=OutcomeStats(dict)  #fpAkka postprocessor as python
+#   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
    fpa = startup(optdict)
    for record in range(len(fpa)):
          stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
    print("in main, stats=")
    print(stats)
-
-   
-
 if __name__ == '__main__':
    main()

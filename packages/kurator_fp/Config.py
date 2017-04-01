@@ -25,8 +25,6 @@ def config(configFileName=None) :  #default stats.ini
       vvv = parser.get('DEFAULT','validators')
       ooo = parser.get('DEFAULT','outcomes')
       dict = {'validators':vvv, 'outcomes':ooo}
-#      print(dict)
-#      sys.exit()
       return dict
 
 
@@ -35,6 +33,8 @@ def main():
    cc = config("stats.ini")
    print("cc=")
    print(cc)
+   print("oo=")
+   print(cc['outcomes'])
 
 if __name__ == "__main__" :
    main()
