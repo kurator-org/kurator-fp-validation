@@ -20,7 +20,7 @@ import argparse
 from actor_decorator import python_actor
 import numpy as np
 import sys
-import BreakPoint as bp
+
 
 
 def startup(dict) :
@@ -29,8 +29,6 @@ def startup(dict) :
       with open(infile) as data_file:
         fpa=json.load(data_file) #python form of fpAkka post processor json
       return fpa   #making a copy??? OK???
-
-   
 
 def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
    data=fpa[record]["Markers"]
@@ -43,8 +41,32 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
       z.itemset((i,outcomeIndex),1)
       stats  = stats+z
    return stats
-   
-  
+
+    #convenience methods
+def nmpyArrayToPythonList(array):
+      try:
+            return array.tolist()
+      except TypeError:
+            return array
+
+def pythonListToNmpy(list):     #should check that the Python is a list?
+      try:
+            return(np.array(list))
+      except TypeError:
+            return list
+      
+
+def nmpyArrayToPythonTuple(array):
+      try:
+            return tuple(nmpyArrayToPythonTuple(i) for i in array)
+      except TypeError:
+            return array
+
+def pythonTupleToNmpy(tuple):
+      try:
+            return np.asarray(tuple)
+      except TypeError:
+            return tuple
 
 def main():
    import Config
@@ -58,7 +80,21 @@ def main():
    fpa = startup(optdict)
    for record in range(len(fpa)):
          stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
-   print("in main, stats=")
+   print("in main, stats as numpy 2d array :")
    print(stats)
+   print("in main, stats as python list of lists:")
+   statsAsPythonList = nmpyArrayToPythonList(stats)
+   print(statsAsPythonList)
+   print("zz=")
+   print(pythonTupleToNmpy(statsAsPythonList))
+
+   print("in main, statsAsPython to nmpy array:")
+   print(pythonListToNmpy(statsAsPythonList))
+
+
+   statstpl=nmpyArrayToPythonTuple(stats)
+   print(pythonTupleToNmpy(statstpl))
+   print("in main, stats to python tuple:")
+   print(nmpyArrayToPythonTuple(stats))
 if __name__ == '__main__':
    main()
