@@ -42,6 +42,22 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
       stats  = stats+z
    return stats
 
+def getStats() :
+   import Config
+#   import OutcomeStats as ocstats
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
+   optdict = {'inputfile':'occurrence_qc.json' }
+   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
+   infile = optdict.get('inputfile')
+#   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
+   fpa = startup(optdict)
+   for record in range(len(fpa)):
+         stats = updateValidatorStats(fpa, stats,validators, outcomes, record) 
+   statsAsPythonLisTuples = nmpyArrayToPythonTuple(stats)
+   return statsAsPythonLisTuples
+
     #convenience methods
 def nmpyArrayToPythonList(array):
       try:
