@@ -27,8 +27,22 @@ def config(configFileName=None) :  #default stats.ini
       dict = {'validators':vvv, 'outcomes':ooo}
       return dict
 
+   #Helper function borrowed from
+   #   https://wiki.python.org/moin/ConfigParserExamples
+def ConfigSectionMap(section):
+    dict1 = {}
+    options = Config.options(section)
+    for option in options:
+        try:
+            dict1[option] = Config.get(section, option)
+            if dict1[option] == -1:
+                DebugPrint("skip: %s" % option)
+        except:
+            print("exception on %s!" % option)
+            dict1[option] = None
+    return dict1
 
-def main():
+def xmain():
    import pprint
    cc = config("stats.ini")
    print("cc=")
@@ -36,6 +50,9 @@ def main():
    print("oo=")
    print(cc['outcomes'])
 
+def main():
+      print("main")
+      
 if __name__ == "__main__" :
    main()
 

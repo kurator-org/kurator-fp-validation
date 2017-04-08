@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-06T18:14:03-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-08T16:37:32-04:00"
 
 import json
 import configparser
@@ -35,12 +35,9 @@ def getWorksheet(wb, sheet=None):
     else:
         return sheet
 
-#def wsInit(name):
-
-
-
 def getOutcomeColors():
 
+    #To do : get outcome names from Config
     grnFill=PatternFill("solid", fgColor='00FF00') #lite green
     redFill=PatternFill("solid", fgColor='FF0000')
     musFill=PatternFill("solid", fgColor='DDDD00') #mustard
@@ -52,31 +49,47 @@ def getOutcomeColors():
               "UNABLE_CURATE":gryFill}
     return colors
 
-def main():
-    wb = Workbook()
-    ws = wb.active
-    colors = getOutcomeColors()
-  #  border = Border(left=Side(border_style=None, color='FFFFFF'),
-   #                    right=Side(border_style=None, color='FFFFFF'),
-   #                   bottom=Side(border_style=None, color='FFFFFF'),
-   #                   top=Side(border_style=None, color='FFFFFF'))
-    thin = Side(border_style="thin", color="000000")
+def setColumnStyles(ws, rowOrigin, colOrigin):
+    thin   = Side(border_style="thin",   color="000000")
     double = Side(border_style="double", color="000000")
-
-    border = Border(top=double, left=thin, right=thin,bottom=double)                
+    border = Border(top=double,left=thin,right=thin,bottom=double)
     outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE")
-#    style_range(ws, 'A1:E4', theborder)
+    
     statsAsTuples = ocstats.getStats()
     for index in range(len(statsAsTuples)):
         rownum=index
+        row = rownum+1+rowOrigin
         theRowTuple = statsAsTuples[index]
         for index in range(len(theRowTuple)):
             colnum = index
+            column = colnum+1+colOrigin
             value = theRowTuple[index]
-            thecell = ws.cell(column=colnum+1,row=rownum+1,value=value)
+#            thecell = ws.cell(column=colnum+1+colOrigin,row=rownum+1+rowOrigin,value=value)
+            thecell = ws.cell(column=column,row=row,value=value)
             outcome = outcomes[colnum]
             thecell.fill = getOutcomeColors()[outcome]
             thecell.border = border
+  
+    
+def main():
+    wb = Workbook()
+    ws = wb.active
+    rowOrigin = 3
+    colOrigin = 5
+    setColumnStyles(ws, rowOrigin, colOrigin)
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 #            print (border)
     wb.save('stats.xlsx')
