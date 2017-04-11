@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-08T16:37:32-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-10T23:01:32-04:00"
 
 import json
 import configparser
@@ -49,13 +49,68 @@ def getOutcomeColors():
               "UNABLE_CURATE":gryFill}
     return colors
 
+def vtl(string):
+    return len(string)
+
 def setColumnStyles(ws, rowOrigin, colOrigin):
     thin   = Side(border_style="thin",   color="000000")
     double = Side(border_style="double", color="000000")
     border = Border(top=double,left=thin,right=thin,bottom=double)
-    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",  "UNABLE_CURATE")
-    
+    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",
+                "UNABLE_CURATE")
+    validators = ("ScientificNameValidator","DateValidator",
+                  "GeoRefValidator","BasisOfRecordValidator")
+
+    maxvtl =  0 #max validator typographic length 
+    for index in range(len(validators)): #enter validator labels and
+                                         #find typographically longest
+        value = validators[index]
+        thecell=ws.cell(column=colOrigin, row=rowOrigin+index+1,
+                        value=value)
+           #next find the currently largest validator name string
+        vtl = len(value)
+        if vtl > maxvtl :
+            maxvtl = vtl
+        #reset column width to current value of maxvtl
+    ws.column_dimensions[thecell.column].width = maxvtl
+
+
+    maxotl = 0 #max outcome typographic length;
+    print(len(outcomes))
+    for index in range(len(outcomes)):
+        value = outcomes[index]
+        otl = len(value)
+        if otl>maxotl:
+            maxotl = otl
+#    print ("maxotl:", maxotl)
+        
+    for index in range(len(outcomes)):
+        outcomes2=("CORRECT","CURATED","FILLED_\nIN", "UNABLE_\nDETERMINE_\nVALIDITY", "UNABLE_\nCURATE")
+#        value = outcomes[index]
+        value = outcomes2[index]
+        otl = len(value) #GAAK! this is character count!
+        alignment=Alignment(horizontal='general',
+                     vertical='justify',
+                     text_rotation=0,
+                     wrap_text=True,
+                     shrink_to_fit=False,
+                     indent=0)
+        print (index, value, otl)
+        thecell = ws.cell(column=colOrigin+index+1,row=rowOrigin,value=value)
+        thecell.alignment = alignment
+        thecell_col = thecell.column
+        
+ #       print("thecell_col:", thecell_col)
+        ws.column_dimensions[thecell_col].width = maxotl
+    #    ws.column_dimensions[thecell_col].height = 20
+        
+#    thecell = ws.cell(column=colOrigin,row=,rowOrigin, )
+    rd = ws.row_dimensions[rowOrigin]
+    rd.height = 45
+        # print(thecell)
     statsAsTuples = ocstats.getStats()
+
+
     for index in range(len(statsAsTuples)):
         rownum=index
         row = rownum+1+rowOrigin
@@ -64,7 +119,6 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
             colnum = index
             column = colnum+1+colOrigin
             value = theRowTuple[index]
-#            thecell = ws.cell(column=colnum+1+colOrigin,row=rownum+1+rowOrigin,value=value)
             thecell = ws.cell(column=column,row=row,value=value)
             outcome = outcomes[colnum]
             thecell.fill = getOutcomeColors()[outcome]
@@ -74,7 +128,7 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
 def main():
     wb = Workbook()
     ws = wb.active
-    rowOrigin = 3
+    rowOrigin = 4
     colOrigin = 5
     setColumnStyles(ws, rowOrigin, colOrigin)
     
