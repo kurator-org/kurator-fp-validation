@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-04-11T22:29:26-04:00"
+__version__ = "OutcomeStats.py 2017-04-12T17:58:05-04:00"
 
 import json
 import configparser
@@ -20,6 +20,7 @@ import argparse
 from actor_decorator import python_actor
 import numpy as np
 import sys
+import codecs
 
 
 
@@ -91,7 +92,6 @@ def pythonTupleToJson(tuple):
             return tuple
 
 def numpyArrayToJson(array, json_file=None):
-      import codecs
       try:
             if json_file is None:
                   jason_file = stats.json
@@ -101,11 +101,58 @@ def numpyArrayToJson(array, json_file=None):
       except TypeError:
             return array
 
+def jsonDefault(object):
+      return object.__dict__
+
+def obj_dict(obj):
+   #
+      #ooo = obj.__dict__
+      #print ("ooo:",ooo)
+      #return ooo #obj.__dict__
+      return obj.__dict__
+
+# from stackoverflow.com how-do-i-check-if-a-string-is-valid-json-in-python
+# cc-by-3.0
+def is_json(myjson): 
+  try:
+    json_object = json.loads(myjson)
+  except ValueError, e:
+    return False
+  return True
+
+
+def outcomesToJson(outcomes,json_file=None):
+      try:
+#            print outcomes
+          #  sys.exit()
+            if json_file is None:
+                  jason_file  = "outcomes.json"
+#            json.dump(outcomes, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+                  xx = list(outcomes)
+                  print("xx=", xx)
+           #       jd=json.dump(xx, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+               ###   xxx=obj_dict(xx)
+               ###   print("xxx:",xxx)
+#                  sys.exit()
+    #            #  jd = json.dumps(xx,default=jsonDefault)
+                  json_string = json.dumps(xx, default=obj_dict)
+                 # json_string = json.dumps([ob.__dict__ for ob in xx])
+                  print("json_string=",json_string, type(json_string))
+#                  sys.exit()
+            return json_string
+      except TypeError:
+            return outcomes
+
 def main():
    import Config
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
+   ooJ=outcomesToJson(outcomes)
+   print("ooJ:",ooJ)
+   print("load ooJ:", json.loads(ooJ))
+   
+   sys.exit()
    optdict = {'inputfile':'occurrence_qc.json' }
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
    infile = optdict.get('inputfile')
@@ -129,11 +176,11 @@ def main():
 #   print("statstupl:",statstpl)
 
    numpyArrayToJson(stats, "stats.json")
-   sys.exit()
+#   sys.exit()
    print(pythonTupleToNmpy(statstpl))
    print("in main, stats to python tuple:")
    print(nmpyArrayToPythonTuple(stats))
-
-   print(json.dumps(statstpl))
+   outcomesToJson(outcomes)
+  # print(json.dumps(statstpl))
 if __name__ == '__main__':
    main()
