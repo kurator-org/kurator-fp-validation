@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-03-31T23:15:04-04:00"
+__version__ = "OutcomeStats.py 2017-04-11T22:29:26-04:00"
 
 import json
 import configparser
@@ -84,6 +84,23 @@ def pythonTupleToNmpy(tuple):
       except TypeError:
             return tuple
 
+def pythonTupleToJson(tuple):
+      try:
+            return json.dump(tuple)
+      except TypeError:
+            return tuple
+
+def numpyArrayToJson(array, json_file=None):
+      import codecs
+      try:
+            if json_file is None:
+                  jason_file = stats.json
+            np_array_to_list = array.tolist()
+            b = np_array_to_list
+            json.dump(b, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+      except TypeError:
+            return array
+
 def main():
    import Config
    config = Config.config('stats.ini')
@@ -109,8 +126,14 @@ def main():
 
 
    statstpl=nmpyArrayToPythonTuple(stats)
+#   print("statstupl:",statstpl)
+
+   numpyArrayToJson(stats, "stats.json")
+   sys.exit()
    print(pythonTupleToNmpy(statstpl))
    print("in main, stats to python tuple:")
    print(nmpyArrayToPythonTuple(stats))
+
+   print(json.dumps(statstpl))
 if __name__ == '__main__':
    main()

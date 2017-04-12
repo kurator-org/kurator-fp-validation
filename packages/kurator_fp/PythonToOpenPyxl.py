@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-10T23:01:32-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-11T22:29:26-04:00"
 
 import json
 import configparser
