@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-04-12T17:58:05-04:00"
+__version__ = "OutcomeStats.py 2017-04-12T18:07:06-04:00"
 
 import json
 import configparser
@@ -97,9 +97,39 @@ def numpyArrayToJson(array, json_file=None):
                   jason_file = stats.json
             np_array_to_list = array.tolist()
             b = np_array_to_list
+            print("nmpy:", b, type(b))
             json.dump(b, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
       except TypeError:
             return array
+
+def labelsToJson(labels,labelname, json_file=None):
+            print("inLabelsToJson:", labels, type(labels))
+            labelList=list(labels)
+            json_string = ""
+
+            if True: #json_file is None:
+                  filename = labelname +".json"
+                  jason_file  = "outcomes.json"
+#                  jason_file  = filename
+                  print("filename:",filename)
+                  xx = list(labels)
+                  print("xx=", xx)
+#                  json_string = json.dumps(xx, default=obj_dict)
+#                  print("json_string=",json_string, type(json_string))
+    #              print("str(labelList",type(str(labelList)), str(labelList))
+   #               json_string = json.dump(xx, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+                  json_string =json.dumps(labelList)
+#                  print("labelList", labelList)
+#                  print("json_string", json_string)
+#                  print("is_json(json_string):", is_json(json_string))
+##                  theFile = open(filename, 'w')
+##                  theFile.write(json_string)
+                     #close file??
+    #              sys.exit()
+
+
+            return json_string
+
 
 def jsonDefault(object):
       return object.__dict__
@@ -121,7 +151,8 @@ def is_json(myjson):
   return True
 
 
-def outcomesToJson(outcomes,json_file=None):
+
+def xoutcomesToJson(outcomes,json_file=None):
       try:
 #            print outcomes
           #  sys.exit()
@@ -138,7 +169,7 @@ def outcomesToJson(outcomes,json_file=None):
                   json_string = json.dumps(xx, default=obj_dict)
                  # json_string = json.dumps([ob.__dict__ for ob in xx])
                   print("json_string=",json_string, type(json_string))
-#                  sys.exit()
+                  sys.exit()
             return json_string
       except TypeError:
             return outcomes
@@ -148,10 +179,14 @@ def main():
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
-   ooJ=outcomesToJson(outcomes)
+#   ooJ=xoutcomesToJson(outcomes)
+   ooJ=labelsToJson(outcomes,"outcomes") #, "foo.json")
+   print("is_json(ooJ", is_json(ooJ))
    print("ooJ:",ooJ)
    print("load ooJ:", json.loads(ooJ))
-   
+   filename="outcomes.json"
+   theFile = open(filename, 'w')
+   theFile.write(ooJ)
    sys.exit()
    optdict = {'inputfile':'occurrence_qc.json' }
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
@@ -180,7 +215,7 @@ def main():
    print(pythonTupleToNmpy(statstpl))
    print("in main, stats to python tuple:")
    print(nmpyArrayToPythonTuple(stats))
-   outcomesToJson(outcomes)
+#   outcomesToJson(outcomes)
   # print(json.dumps(statstpl))
 if __name__ == '__main__':
    main()
