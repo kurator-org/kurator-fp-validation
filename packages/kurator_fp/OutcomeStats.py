@@ -12,9 +12,10 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-04-12T18:07:06-04:00"
+__version__ = "OutcomeStats.py 2017-04-17T18:07:06-04:00"
 
 import json
+import Config
 import configparser
 import argparse
 from actor_decorator import python_actor
@@ -44,7 +45,6 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
    return stats
 
 def getStats() :
-   import Config
 #   import OutcomeStats as ocstats
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
@@ -109,11 +109,11 @@ def labelsToJson(labels,labelname, json_file=None):
 
             if True: #json_file is None:
                   filename = labelname +".json"
-                  jason_file  = "outcomes.json"
+##                  jason_file  = "outcomes.json"
 #                  jason_file  = filename
-                  print("filename:",filename)
-                  xx = list(labels)
-                  print("xx=", xx)
+#                  print("filename:",filename)
+#                  xx = list(labels)
+#                  print("xx=", xx)
 #                  json_string = json.dumps(xx, default=obj_dict)
 #                  print("json_string=",json_string, type(json_string))
     #              print("str(labelList",type(str(labelList)), str(labelList))
@@ -150,53 +150,39 @@ def is_json(myjson):
     return False
   return True
 
-
-
-def xoutcomesToJson(outcomes,json_file=None):
-      try:
-#            print outcomes
-          #  sys.exit()
-            if json_file is None:
-                  jason_file  = "outcomes.json"
-#            json.dump(outcomes, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
-                  xx = list(outcomes)
-                  print("xx=", xx)
-           #       jd=json.dump(xx, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
-               ###   xxx=obj_dict(xx)
-               ###   print("xxx:",xxx)
-#                  sys.exit()
-    #            #  jd = json.dumps(xx,default=jsonDefault)
-                  json_string = json.dumps(xx, default=obj_dict)
-                 # json_string = json.dumps([ob.__dict__ for ob in xx])
-                  print("json_string=",json_string, type(json_string))
-                  sys.exit()
-            return json_string
-      except TypeError:
-            return outcomes
-
-def main():
-   import Config
+#def getStats(validators, outcomes, fpa, optdict):
+def getStatsAsNmpyArray(validators, outcomes, optdict):
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
-#   ooJ=xoutcomesToJson(outcomes)
-   ooJ=labelsToJson(outcomes,"outcomes") #, "foo.json")
-   print("is_json(ooJ", is_json(ooJ))
-   print("ooJ:",ooJ)
-   print("load ooJ:", json.loads(ooJ))
-   filename="outcomes.json"
-   theFile = open(filename, 'w')
-   theFile.write(ooJ)
-   sys.exit()
-   optdict = {'inputfile':'occurrence_qc.json' }
+ #  optdict = {'inputfile':'occurrence_qc.json' } #temp override
+ #  inputfile = eval(config['inputfile'])
+   #print (inputfile, type(inputfile))
+#   sys.exit()
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
-   infile = optdict.get('inputfile')
-#   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
+  # infile = optdict.get('inputfile')
    fpa = startup(optdict)
    for record in range(len(fpa)):
          stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
-   print("in main, stats as numpy 2d array :")
-   print(stats)
+   return(stats)
+
+def main():
+
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
+   print ("theoutcomes:", outcomes)
+   optdict = {'inputfile':'occurrence_qc.json' }
+#   infile =   config['inputfile']
+#   inputfile =   eval(config['inputfile'])
+   inputfile = "occurrence_qc.json"
+#   print ("infile=", infile, type(infile))
+#   sys.exit()
+   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
+ #  infile = optdict.get('inputfile')
+   # fpa = startup(optdict)
+   stats = getStatsAsNmpyArray(validators, outcomes, optdict)
+   print("stats=", stats, type(stats))
    print("in main, stats as python list of lists:")
    statsAsPythonList = nmpyArrayToPythonList(stats)
    print(statsAsPythonList)
@@ -215,7 +201,5 @@ def main():
    print(pythonTupleToNmpy(statstpl))
    print("in main, stats to python tuple:")
    print(nmpyArrayToPythonTuple(stats))
-#   outcomesToJson(outcomes)
-  # print(json.dumps(statstpl))
 if __name__ == '__main__':
    main()
