@@ -32,6 +32,17 @@ def startup(dict) :
         fpa=json.load(data_file) #python form of fpAkka post processor json
       return fpa   #making a copy??? OK???
 
+
+def getStatsAsNmpyArray(validators, outcomes, optdict):
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
+   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
+   fpa = startup(optdict)
+   for record in range(len(fpa)): #one record at a time
+         stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
+   return(stats)
+
 def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
    data=fpa[record]["Markers"]
    for i in range(len(validators)) :
@@ -44,15 +55,13 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
       stats  = stats+z
    return stats
 
-def getStats() :
-#   import OutcomeStats as ocstats
+def getStats(optdict) :
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
-   optdict = {'inputfile':'occurrence_qc.json' }
+#   optdict = {'inputfile':'occurrence_qc.json' }
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
    infile = optdict.get('inputfile')
-#   dict = {'infile': infile, 'validators':validators, 'outcomes':outcomes}
    fpa = startup(optdict)
    for record in range(len(fpa)):
          stats = updateValidatorStats(fpa, stats,validators, outcomes, record) 
@@ -91,7 +100,7 @@ def pythonTupleToJson(tuple):
       except TypeError:
             return tuple
 
-def numpyArrayToJson(array, json_file=None):
+def numpyArrayToJsonFile(array, json_file=None):
       try:
             if json_file is None:
                   jason_file = stats.json
@@ -103,43 +112,15 @@ def numpyArrayToJson(array, json_file=None):
             return array
 
 def labelsToJson(labels,labelname, json_file=None):
-            print("inLabelsToJson:", labels, type(labels))
+#            print("inLabelsToJson:", labels, type(labels))
             labelList=list(labels)
             json_string = ""
-
             if True: #json_file is None:
                   filename = labelname +".json"
-##                  jason_file  = "outcomes.json"
-#                  jason_file  = filename
-#                  print("filename:",filename)
-#                  xx = list(labels)
-#                  print("xx=", xx)
-#                  json_string = json.dumps(xx, default=obj_dict)
-#                  print("json_string=",json_string, type(json_string))
-    #              print("str(labelList",type(str(labelList)), str(labelList))
-   #               json_string = json.dump(xx, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
-                  json_string =json.dumps(labelList)
-#                  print("labelList", labelList)
-#                  print("json_string", json_string)
-#                  print("is_json(json_string):", is_json(json_string))
-##                  theFile = open(filename, 'w')
-##                  theFile.write(json_string)
-                     #close file??
-    #              sys.exit()
-
-
             return json_string
 
-
-def jsonDefault(object):
-      return object.__dict__
-
 def obj_dict(obj):
-   #
-      #ooo = obj.__dict__
-      #print ("ooo:",ooo)
-      #return ooo #obj.__dict__
-      return obj.__dict__
+       return obj.__dict__
 
 # from stackoverflow.com how-do-i-check-if-a-string-is-valid-json-in-python
 # cc-by-3.0
@@ -150,56 +131,46 @@ def is_json(myjson):
     return False
   return True
 
-#def getStats(validators, outcomes, fpa, optdict):
-def getStatsAsNmpyArray(validators, outcomes, optdict):
-   config = Config.config('stats.ini')
-   validators = eval(config['validators'])
-   outcomes = eval(config['outcomes'])
- #  optdict = {'inputfile':'occurrence_qc.json' } #temp override
- #  inputfile = eval(config['inputfile'])
-   #print (inputfile, type(inputfile))
-#   sys.exit()
-   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
-  # infile = optdict.get('inputfile')
-   fpa = startup(optdict)
-   for record in range(len(fpa)):
-         stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
-   return(stats)
+def labelsToJson(labels,labelname):
+            labelList=list(labels)
+            json_string = ""
+            json_string =json.dumps(labelList)
+            return json_string
+
+def jsonToFile(jsonStr, filename):
+      theFile = open(filename, 'w') #should test success
+      if is_json(jsonStr):
+            theFile.write(jsonStr)
+            theFile.close()  #make unwriteable???
+            return True
+      else :
+            return False
+
 
 def main():
-
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
-   print ("theoutcomes:", outcomes)
-   optdict = {'inputfile':'occurrence_qc.json' }
-#   infile =   config['inputfile']
-#   inputfile =   eval(config['inputfile'])
-   inputfile = "occurrence_qc.json"
-#   print ("infile=", infile, type(infile))
-#   sys.exit()
-   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
- #  infile = optdict.get('inputfile')
-   # fpa = startup(optdict)
+   optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json' }
    stats = getStatsAsNmpyArray(validators, outcomes, optdict)
-   print("stats=", stats, type(stats))
-   print("in main, stats as python list of lists:")
    statsAsPythonList = nmpyArrayToPythonList(stats)
-   print(statsAsPythonList)
-   print("zz=")
-   print(pythonTupleToNmpy(statsAsPythonList))
-
-   print("in main, statsAsPython to nmpy array:")
-   print(pythonListToNmpy(statsAsPythonList))
-
-
+   pythonListToNmpy(statsAsPythonList)
+   
    statstpl=nmpyArrayToPythonTuple(stats)
-#   print("statstupl:",statstpl)
+   pythonTupleToNmpy(statsAsPythonList)
+   numpyArrayToJsonFile(stats, optdict['outputfile'])
+   pythonTupleToNmpy(statstpl)
 
-   numpyArrayToJson(stats, "stats.json")
-#   sys.exit()
-   print(pythonTupleToNmpy(statstpl))
-   print("in main, stats to python tuple:")
-   print(nmpyArrayToPythonTuple(stats))
+   ltvj=labelsToJson(validators,"validators")
+   jsonToFile(ltvj, "validators.json")
+   ltoj=labelsToJson(outcomes, "outcomes.json")
+   jsonToFile(ltoj, "outcomes.json")
+      #json i/o sanity check
+   jsonFile = open("outcomes.json",'r')
+   lbls = jsonFile.read()
+   print("lbls:", lbls, type(lbls))
+   jsonFile.close()
+   print(is_json (lbls))
+   
 if __name__ == '__main__':
    main()
