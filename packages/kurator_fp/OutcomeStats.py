@@ -189,5 +189,12 @@ def main():
    print(is_json (lbls))
    ### In linux examine *.json e.g. with "more" and check dates
    ### of all of {stats,outcomes,validators}.json
+
+   # David: aggregates the three results into a single json file
+   jsonDict = { 'validators': validators, 'outcomes': outcomes, 'stats': stats.tolist() }
+
+   with open('results.json', 'w') as outfile:
+       json.dump(jsonDict, outfile)
+
 if __name__ == '__main__':
    main()
