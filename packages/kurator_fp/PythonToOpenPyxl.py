@@ -12,12 +12,13 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-11T22:29:26-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-23T17:15:28-04:00"
 
 import json
+import Config
 import configparser
 import argparse
-from actor_decorator import python_actor
+#from actor_decorator import python_actor
 import numpy as np
 from openpyxl import Workbook
 #from openpyxl.styles import.colors
@@ -34,8 +35,24 @@ def getWorksheet(wb, sheet=None):
         return wb.active
     else:
         return sheet
-
 def getOutcomeColors():
+  #  config = Config.config('styles.ini')
+  #   outcomeFills = eval(config['outcomeFills'])
+  #    print (outcomeFills)
+  #    sys.exit()
+    #To do : get outcome names from Config
+    grnFill=PatternFill("solid", fgColor='00FF00') #lite green
+    redFill=PatternFill("solid", fgColor='FF0000')
+    musFill=PatternFill("solid", fgColor='DDDD00') #mustard
+    yelFill=PatternFill("solid", fgColor='FFFF00')
+    gryFill=PatternFill("solid", fgColor='888888')
+
+    colors = {"CORRECT":grnFill,"CURATED":yelFill,
+              "FILLED_IN":musFill,"UNABLE_DETERMINE_VALIDITY":redFill,
+              "UNABLE_CURATE":gryFill}
+    return colors
+
+def xgetOutcomeColors():
 
     #To do : get outcome names from Config
     grnFill=PatternFill("solid", fgColor='00FF00') #lite green
@@ -52,7 +69,7 @@ def getOutcomeColors():
 def vtl(string):
     return len(string)
 
-def setColumnStyles(ws, rowOrigin, colOrigin):
+def setColumnStyles(ws, optdict):
     thin   = Side(border_style="thin",   color="000000")
     double = Side(border_style="double", color="000000")
     border = Border(top=double,left=thin,right=thin,bottom=double)
@@ -61,6 +78,8 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
     validators = ("ScientificNameValidator","DateValidator",
                   "GeoRefValidator","BasisOfRecordValidator")
 
+    rowOrigin = optdict['rowOrigin']
+    colOrigin = optdict['colOrigin']
     maxvtl =  0 #max validator typographic length 
     for index in range(len(validators)): #enter validator labels and
                                          #find typographically longest
@@ -76,7 +95,7 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
 
 
     maxotl = 0 #max outcome typographic length;
-    print(len(outcomes))
+#    print(len(outcomes))
     for index in range(len(outcomes)):
         value = outcomes[index]
         otl = len(value)
@@ -95,7 +114,7 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
                      wrap_text=True,
                      shrink_to_fit=False,
                      indent=0)
-        print (index, value, otl)
+#        print (index, value, otl)
         thecell = ws.cell(column=colOrigin+index+1,row=rowOrigin,value=value)
         thecell.alignment = alignment
         thecell_col = thecell.column
@@ -108,7 +127,7 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
     rd = ws.row_dimensions[rowOrigin]
     rd.height = 45
         # print(thecell)
-    statsAsTuples = ocstats.getStats()
+    statsAsTuples = ocstats.getStats(optdict)
 
 
     for index in range(len(statsAsTuples)):
@@ -123,28 +142,17 @@ def setColumnStyles(ws, rowOrigin, colOrigin):
             outcome = outcomes[colnum]
             thecell.fill = getOutcomeColors()[outcome]
             thecell.border = border
-  
+
     
 def main():
+    cfgopyxl = Config.config('stats.ini')
+    outcomeFills = eval(cfgopyxl['outcomeFills'])
+    print ("outcomeFills:",outcomeFills)
+#    sys.exit()
     wb = Workbook()
     ws = wb.active
-    rowOrigin = 4
-    colOrigin = 5
-    setColumnStyles(ws, rowOrigin, colOrigin)
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
+    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':4 }
+    setColumnStyles(ws, optdict)
 #            print (border)
     wb.save('stats.xlsx')
     

@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-04-20T16:25:01-04:00"
+__version__ = "OutcomeStats.py 2017-04-23T17:15:28-04:00"
 
 import json
 import Config
