@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-23T17:15:28-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-24T17:30:55-04:00"
 
 import json
 import Config
@@ -52,34 +52,24 @@ def getOutcomeColors():
               "UNABLE_CURATE":gryFill}
     return colors
 
-def xgetOutcomeColors():
-
-    #To do : get outcome names from Config
-    grnFill=PatternFill("solid", fgColor='00FF00') #lite green
-    redFill=PatternFill("solid", fgColor='FF0000')
-    musFill=PatternFill("solid", fgColor='DDDD00') #mustard
-    yelFill=PatternFill("solid", fgColor='FFFF00')
-    gryFill=PatternFill("solid", fgColor='888888')
-
-    colors = {"CORRECT":grnFill,"CURATED":yelFill,
-              "FILLED_IN":musFill,"UNABLE_DETERMINE_VALIDITY":redFill,
-              "UNABLE_CURATE":gryFill}
-    return colors
 
 def vtl(string):
     return len(string)
 
+        
 def setColumnStyles(ws, optdict):
     thin   = Side(border_style="thin",   color="000000")
     double = Side(border_style="double", color="000000")
     border = Border(top=double,left=thin,right=thin,bottom=double)
-    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY",
-                "UNABLE_CURATE")
-    validators = ("ScientificNameValidator","DateValidator",
-                  "GeoRefValidator","BasisOfRecordValidator")
+#    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY", "UNABLE_CURATE")
+#    validators = ("ScientificNameValidator","DateValidator",
+         #         "GeoRefValidator","BasisOfRecordValidator")
+    validators = eval(Config.config("stats.ini")['validators'])
+    outcomes = eval(Config.config("stats.ini")['outcomes'])
+    outcomes2 = eval(Config.config("stats.ini")['outcomesFolded'])
 
-    rowOrigin = optdict['rowOrigin']
     colOrigin = optdict['colOrigin']
+    rowOrigin = optdict['rowOrigin']
     maxvtl =  0 #max validator typographic length 
     for index in range(len(validators)): #enter validator labels and
                                          #find typographically longest
@@ -102,11 +92,12 @@ def setColumnStyles(ws, optdict):
         if otl>maxotl:
             maxotl = otl
 #    print ("maxotl:", maxotl)
-        
+#    print("outcomes2:",outcomes2)
     for index in range(len(outcomes)):
-        outcomes2=("CORRECT","CURATED","FILLED_\nIN", "UNABLE_\nDETERMINE_\nVALIDITY", "UNABLE_\nCURATE")
+       # outcomes2=("CORRECT","CURATED","FILLED_\nIN", "UNABLE_\nDETERMINE_\nVALIDITY", "UNABLE_\nCURATE")
 #        value = outcomes[index]
         value = outcomes2[index]
+#        print("index,value:",index,value)
         otl = len(value) #GAAK! this is character count!
         alignment=Alignment(horizontal='general',
                      vertical='justify',
@@ -143,19 +134,20 @@ def setColumnStyles(ws, optdict):
             thecell.fill = getOutcomeColors()[outcome]
             thecell.border = border
 
-    
 def main():
-    cfgopyxl = Config.config('stats.ini')
-    outcomeFills = eval(cfgopyxl['outcomeFills'])
-    print ("outcomeFills:",outcomeFills)
+    pyxlConfig = Config.config('stats.ini')
+#    outcomeFills = eval(cfgopyxl['outcomeFills'])
+#    print ("outcomeFills:",outcomeFills)
+#    print("pyxlConfig:")
+#    print(pyxlConfig)
 #    sys.exit()
     wb = Workbook()
     ws = wb.active
-    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':4 }
+    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':3 }
     setColumnStyles(ws, optdict)
 #            print (border)
     wb.save('stats.xlsx')
-    
+
 if __name__ == "__main__" :
    main()
 
