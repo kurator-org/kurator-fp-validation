@@ -63,7 +63,6 @@ def getStats(optdict) :
    config = Config.config('stats.ini')
    validators = eval(config['validators'])
    outcomes = eval(config['outcomes'])
-#   optdict = {'inputfile':'occurrence_qc.json' }
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
    infile = optdict.get('inputfile')
    fpa = startup(optdict)

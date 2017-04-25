@@ -48,12 +48,11 @@ def setColumnStyles(ws, optdict):
     double = Side(border_style="double", color="000000")
     border = Border(top=double,left=thin,right=thin,bottom=double)
 
-    validators = eval(Config.config("stats.ini")['validators'])
-    outcomes = eval(Config.config("stats.ini")['outcomes'])
-#    outcomes2 = eval(Config.config("stats.ini")['outcomesFolded'])
-    outcomes2 = optdict['outcomesFolded']
-    colOrigin = optdict['colOrigin']
-    rowOrigin = optdict['rowOrigin']
+    outcomes =   optdict['outcomes']
+    validators = optdict['validators']
+    outcomes2 =  optdict['outcomesFolded']
+    colOrigin =  optdict['colOrigin']
+    rowOrigin =  optdict['rowOrigin']
     outcomeFills = optdict['outcomeFills']
     maxvtl =  0 #max validator typographic length 
     for index in range(len(validators)): #enter validator labels and
@@ -70,7 +69,6 @@ def setColumnStyles(ws, optdict):
 
 
     maxotl = 0 #max outcome typographic length;
-#    print(len(outcomes))
     for index in range(len(outcomes)):
         value = outcomes[index]
         otl = len(value)
@@ -104,21 +102,23 @@ def setColumnStyles(ws, optdict):
             value = theRowTuple[index]
             thecell = ws.cell(column=column,row=row,value=value)
             outcome = outcomes[colnum]
-            thecell.fill =   PatternFill("solid", fgColor=outcomeFills[outcome]) #lite green
+            thecell.fill =   PatternFill("solid", fgColor=outcomeFills[outcome])
             thecell.border = border
 
 def main():
     pyxlConfig = Config.config('stats.ini')
     outcomeFills = eval(pyxlConfig['outcomeFills'])
     outcomesFolded = eval(pyxlConfig['outcomesFolded'])
-    
-    print ("outcomeFills:",outcomeFills)
-    print("pyxlConfig:")
-    print(pyxlConfig)
+#    print ("outcomeFills:",outcomeFills)
+#    print("pyxlConfig:")
+#    print(pyxlConfig)
+    outcomes = eval(pyxlConfig['outcomes'])
+    validators = eval(pyxlConfig['validators'])
+#    print("outcomes:",outcomes)
    
     wb = Workbook()
     ws = wb.active
-    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':3, 'outcomeFills':outcomeFills,  'outcomesFolded':outcomesFolded}
+    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':4, 'outcomeFills':outcomeFills,  'outcomesFolded':outcomesFolded, 'outcomes':outcomes, 'validators':validators}
     setColumnStyles(ws, optdict)
 #            print (border)
     wb.save('stats.xlsx')
