@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "Config.py 2017-04-24T17:30:55-04:00"
+__version__ = "Config.py 2017-04-25T17:30:55-04:00"
 
 import sys
 import ConfigParser
@@ -24,7 +24,7 @@ def config(configFileName=None) :  #default stats.ini
       ccc = parser.read(configFileName)
       vvv = parser.get('DEFAULT','validators')
       ooo = parser.get('DEFAULT','outcomes')
-      ofd =  parser.get('DEFAULT','outcomesFolded')
+      ofd =  parser.get('OPENPYXL','outcomesFolded')
       dict = {'validators':vvv, 'outcomes':ooo, 'outcomesFolded':ofd}
       try:
             fff = parser.get('OPENPYXL','outcomeFills')
