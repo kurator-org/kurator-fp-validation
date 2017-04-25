@@ -55,13 +55,6 @@ def main():
    print("cc=")
    print(cc)
 
-   
-#   outcomeFills = ConfigSectionMap("OPENPYXL")['outcomeFills']
-#   print(outcomeFills)
-
-def xmain():
-      print("main")
-      
 if __name__ == "__main__" :
    main()
 

@@ -36,10 +36,10 @@ def getWorksheet(wb, sheet=None):
     else:
         return sheet
 def getOutcomeColors():
-  #  config = Config.config('styles.ini')
-  #   outcomeFills = eval(config['outcomeFills'])
-  #    print (outcomeFills)
-  #    sys.exit()
+#    config = Config.config('styles.ini')
+#    outcomeFills = eval(config['outcomeFills'])
+#    print (outcomeFills)
+  #  sys.exit()
     #To do : get outcome names from Config
     grnFill=PatternFill("solid", fgColor='00FF00') #lite green
     redFill=PatternFill("solid", fgColor='FF0000')
@@ -61,9 +61,7 @@ def setColumnStyles(ws, optdict):
     thin   = Side(border_style="thin",   color="000000")
     double = Side(border_style="double", color="000000")
     border = Border(top=double,left=thin,right=thin,bottom=double)
-#    outcomes = ("CORRECT","CURATED","FILLED_IN", "UNABLE_DETERMINE_VALIDITY", "UNABLE_CURATE")
-#    validators = ("ScientificNameValidator","DateValidator",
-         #         "GeoRefValidator","BasisOfRecordValidator")
+
     validators = eval(Config.config("stats.ini")['validators'])
     outcomes = eval(Config.config("stats.ini")['outcomes'])
     outcomes2 = eval(Config.config("stats.ini")['outcomesFolded'])
@@ -136,11 +134,11 @@ def setColumnStyles(ws, optdict):
 
 def main():
     pyxlConfig = Config.config('stats.ini')
-#    outcomeFills = eval(cfgopyxl['outcomeFills'])
-#    print ("outcomeFills:",outcomeFills)
-#    print("pyxlConfig:")
-#    print(pyxlConfig)
-#    sys.exit()
+    outcomeFills = eval(pyxlConfig['outcomeFills'])
+    print ("outcomeFills:",outcomeFills)
+    print("pyxlConfig:")
+    print(pyxlConfig)
+    sys.exit()
     wb = Workbook()
     ws = wb.active
     optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':3 }
