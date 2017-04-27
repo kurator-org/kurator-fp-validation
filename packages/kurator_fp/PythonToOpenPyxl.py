@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "PythonToOpenPyxl.py 2017-04-25T17:30:55-04:00"
+__version__ = "PythonToOpenPyxl.py 2017-04-27T11:09:22-04:00"
 
 import json
 import Config
@@ -24,6 +24,7 @@ from openpyxl import Workbook
 #from openpyxl.styles import.colors
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Protection, Font
 import OutcomeStats as ocstats
+import OptDict
 import sys
 
 def wbInit():  #should call only once?
@@ -106,19 +107,9 @@ def setColumnStyles(ws, optdict):
             thecell.border = border
 
 def main():
-    pyxlConfig = Config.config('stats.ini')
-    outcomeFills = eval(pyxlConfig['outcomeFills'])
-    outcomesFolded = eval(pyxlConfig['outcomesFolded'])
-#    print ("outcomeFills:",outcomeFills)
-#    print("pyxlConfig:")
-#    print(pyxlConfig)
-    outcomes = eval(pyxlConfig['outcomes'])
-    validators = eval(pyxlConfig['validators'])
-#    print("outcomes:",outcomes)
-   
     wb = Workbook()
     ws = wb.active
-    optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json', 'rowOrigin':2, 'colOrigin':4, 'outcomeFills':outcomeFills,  'outcomesFolded':outcomesFolded, 'outcomes':outcomes, 'validators':validators}
+    optdict = OptDict.getOptDict(rowOrigin=7) #defaults to stats.ini
     setColumnStyles(ws, optdict)
 #            print (border)
     wb.save('stats.xlsx')
