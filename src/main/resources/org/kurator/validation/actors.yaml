@@ -56,3 +56,8 @@ types:
   type: Actor
   properties:
     actorClass: org.kurator.validation.actors.BasisOfRecordValidator
+    
+- id: SingleCriterionStreamFilter
+  type: Actor
+  properties:
+    actorClass: org.kurator.validation.actors.SingleCriterionStreamFilter    
