@@ -5,12 +5,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import org.junit.experimental.categories.Category;
 import org.kurator.akka.ActorConfig;
 import org.kurator.akka.KuratorAkkaTestCase;
 import org.kurator.akka.WorkflowRunner;
 import org.kurator.akka.actors.CsvFileReader;
 import org.kurator.akka.actors.CsvFileWriter;
+import org.kurator.validation.IntegrationTest;
 
+@Category(IntegrationTest.class)
 public class TestInternalDateValidator extends KuratorAkkaTestCase {
 
     private WorkflowRunner wr;

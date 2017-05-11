@@ -97,6 +97,27 @@
 	           </executions>
       	 </plugin>
 
+            <plugin>
+                <!-- Exclude integration tests from default test phase (see integrationTests 
+                    profile) -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.11</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.12</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <includes>
+                        <include>**/*.class</include>
+                    </includes>
+                    <excludedGroups>org.kurator.validation.IntegrationTest</excludedGroups>
+                </configuration>
+            </plugin>	       
+	       
     	   <!-- Add the manifest file to the jar and force classpath to the
                 dependency directory to automatically include the dependency jars -->
     	   <plugin>
@@ -125,7 +146,9 @@
             <!-- Make a standalone jar file -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
                 <configuration>
+                    <archiveBaseDirectory>${project.basedir}</archiveBaseDirectory>
                     <archive>
                         <manifest>
                             <mainClass>org.kurator.akka.KuratorCLI</mainClass>
@@ -208,5 +231,25 @@
 	   </pluginManagement>
 
 	</build>
+	
+	<profiles>
+	           <profile>
+            <!-- mvn package -P integrationTests -->
+            <id>integrationTests</id>
+            <build>
+                <!-- Runs those tests which require connection to a database, will bring 
+                    up a login dialog while running tests -->
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups>org.kurator.validation.IgnoreInIntegration</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+	</profiles>
 
 </project>

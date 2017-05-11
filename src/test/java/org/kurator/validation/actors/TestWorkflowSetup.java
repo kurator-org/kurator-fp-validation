@@ -9,11 +9,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.OutputStreamWriter;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.kurator.akka.ActorConfig;
 import org.kurator.akka.PythonActor;
 import org.kurator.akka.WorkflowRunner;
 import org.kurator.akka.actors.CsvFileReader;
 import org.kurator.akka.actors.CsvFileWriter;
+import org.kurator.validation.IgnoreInIntegration;
 import org.kurator.validation.actors.io.AnalysisSpreadsheetBuilder;
 import org.kurator.validation.actors.io.AnalysisSummaryTranslator;
 import org.kurator.validation.actors.io.JsonSummaryAggregator;
@@ -22,6 +24,7 @@ import org.kurator.validation.actors.io.JsonSummaryAggregator;
  * @author mole
  *
  */
+@Category(IgnoreInIntegration.class)
 public class TestWorkflowSetup {
 
 	@Test

@@ -5,10 +5,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import org.junit.experimental.categories.Category;
 import org.kurator.akka.KuratorAkkaTestCase;
 import org.kurator.akka.WorkflowRunner;
 import org.kurator.akka.YamlFileWorkflowRunner;
+import org.kurator.validation.IntegrationTest;
 
+@Category(IntegrationTest.class)
 public class TestInternalDateValidation extends KuratorAkkaTestCase {
 
     static final String RESOURCE_PATH = "classpath:/org/kurator/validation/workflows/";
