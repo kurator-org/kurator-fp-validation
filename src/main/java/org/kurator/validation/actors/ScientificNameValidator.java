@@ -6,17 +6,22 @@ package org.kurator.validation.actors;
  */
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.filteredpush.kuration.services.sciname.*;
 import org.filteredpush.kuration.util.*;
 import org.gbif.api.model.checklistbank.ParsedName;
 import org.gbif.nameparser.NameParser;
 import org.gbif.nameparser.UnparsableException;
 import org.kurator.akka.KuratorActor;
+import org.kurator.exceptions.KuratorException;
 import org.filteredpush.kuration.interfaces.INewScientificNameValidationService;
 
 import java.io.IOException;
 
 public class ScientificNameValidator extends KuratorActor {
+	
+	private static final Log logger = LogFactory.getLog(ScientificNameValidator.class);
 
     public String serviceClassQN = "org.filteredpush.kuration.services.sciname.COLService";
     public boolean insertLSID = true;
@@ -32,7 +37,7 @@ public class ScientificNameValidator extends KuratorActor {
     private INewScientificNameValidationService scientificNameService;
 
     @Override
-	public void onInitialize() {
+	public void onInitialize() throws KuratorException {
         //initialize required label
         SpecimenRecordTypeConf specimenRecordTypeConf = SpecimenRecordTypeConf.getInstance();
 
@@ -77,7 +82,9 @@ public class ScientificNameValidator extends KuratorActor {
                 case "GBIF":
                 default:
                     if (!authorityName.toUpperCase().equals("GBIF")) {
-                        System.err.println("Unrecognized service (" + authorityName + ") or service not specified, using GBIF.");
+                        String errMessage = "Unrecognized service (" + authorityName + ") or service not specified, using GBIF.";
+                        logger.error(errMessage);
+                        System.out.println(errMessage);
                     }
                     scientificNameService = new GBIFService();
             }
@@ -86,10 +93,13 @@ public class ScientificNameValidator extends KuratorActor {
             if(!taxonomicMode) scientificNameService.setValidationMode(INewScientificNameValidationService.MODE_NOMENCLATURAL);
             else scientificNameService.setValidationMode(INewScientificNameValidationService.MODE_TAXONOMIC);
 
-            //} catch (CurationException e) {
-             //   e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+            	logger.error(e.getClass().getSimpleName() + ": " + e.getMessage());
+            	if (e.getStackTrace().length>0) { 
+            		StackTraceElement failedAt = e.getStackTrace()[0];
+            		logger.debug(failedAt.getClassName() + "." + failedAt.getMethodName() + " " + failedAt.getLineNumber());
+            	}
+                throw new KuratorException("Unable to initialize Actor " + this.getClass().getSimpleName() + ": " + e.getClass().getSimpleName() + ": " + e.getMessage());
             }
 
     }
@@ -146,13 +156,19 @@ public class ScientificNameValidator extends KuratorActor {
                     System.out.println("subgenus = " + subgenus);
                     System.out.println("genus = " + genus);
                      */
+            
+            CurationStatus curationStatus = null;
+            CurationCommentType curationComment = null;
             try {
                 scientificNameService.validateScientificName( scientificName, author, genus, subgenus,specificEpithet, verbatimTaxonRank, infraspecificEpithet, taxonRank, kingdom, phylum, tclass, order, family, genericEpithet);
+                curationStatus = scientificNameService.getCurationStatus();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(),e);
+                curationStatus = CurationComment.UNABLE_DETERMINE_VALIDITY;
+                curationComment = CurationComment.construct(curationStatus,e.getMessage(),scientificNameService.getServiceName());
             }
-
-            CurationStatus curationStatus = scientificNameService.getCurationStatus();
+            
+            if (curationStatus!=CurationComment.UNABLE_DETERMINE_VALIDITY) { 
 
             if (curationStatus == CurationComment.CORRECT) {
                 // If a blank has been filled in from atomic fields and is asserted as correct, put it inot the output.
@@ -184,7 +200,7 @@ public class ScientificNameValidator extends KuratorActor {
                 }
             }
             // add a GUID one was returned
-            if(!scientificNameService.getGUID().equals("")) {
+            if(scientificNameService!=null && scientificNameService.getGUID()!=null && !scientificNameService.getGUID().equals("")) {
                 // TODO: We should be able to handle scientificNameID and acceptedNameUsageID
                 inputSpecimenRecord.put("taxonID", scientificNameService.getGUID());
 
@@ -222,10 +238,11 @@ public class ScientificNameValidator extends KuratorActor {
                     higherFillInComment.append(" | Filled In Family ");
                 }
             }
-
+            
             //output
-            CurationCommentType curationComment = CurationComment.construct(curationStatus,scientificNameService.getComment().concat(higherFillInComment.toString()),scientificNameService.getServiceName());
-
+            curationComment = CurationComment.construct(curationStatus,scientificNameService.getComment().concat(higherFillInComment.toString()),scientificNameService.getServiceName());
+            
+            }
             updateAndSendRecord(inputSpecimenRecord, curationComment);
         }
     }
