@@ -12,7 +12,7 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-04-27T11:09:22-04:00"
+__version__ = "OutcomeStats.py 2017-05-24T11:09:22-04:00"
 
 import json
 import Config
@@ -26,7 +26,7 @@ import OptDict
 
 
 def startup(dict) :
-      infile = dict.get('inputfile')
+      infile = dict['inputfile']
            # convert fpAkka post processor json to python dict
            #infile must be a "file-like object"
            #See https://docs.python.org/2/glossary.html#term-file-object
@@ -60,11 +60,17 @@ def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
    return stats
 
 def getStats(optdict) :
-   config = Config.config('stats.ini')
-   validators = eval(config['validators'])
-   outcomes = eval(config['outcomes'])
+   # David L: will get the commented stuff below from optdict instead
+   #config = Config.config('stats.ini')
+   #validators = eval(config['validators'])
+   #outcomes = eval(config['outcomes'])
+
+   validators = optdict['validators']
+   outcomes = optdict['outcomes']
+
    stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
-   infile = optdict.get('inputfile')
+   infile = optdict['inputfile']
+
    fpa = startup(optdict)
    for record in range(len(fpa)):
          stats = updateValidatorStats(fpa, stats,validators, outcomes, record) 
@@ -106,7 +112,7 @@ def pythonTupleToJson(tuple):
 def numpyArrayToJsonFile(array, json_file=None):
       try:
             if json_file is None:
-                  jason_file = stats.json
+                  jason_file = 'stats.json'
             np_array_to_list = array.tolist()
             b = np_array_to_list
 #            print("nmpy:", b, type(b))
