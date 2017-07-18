@@ -70,7 +70,28 @@
 
 	<build>
 	   <plugins>
-
+		   <!--   <plugin>
+                  <groupId>com.github.maven-nar</groupId>
+                  <artifactId>nar-maven-plugin</artifactId>
+                  <version>3.5.2</version>
+                  <extensions>true</extensions>
+                  <configuration>
+                      <c>
+                          <name>gcc</name>
+                          <includes>
+                              <include>**/*.c</include>
+                          </includes>
+                          <options>
+                              <option>-I/usr/include/python2.7</option>
+                              <option>-L/usr/lib/python2.7/config/</option>
+                              <option>main.c</option>
+                              <option>-lpython2.7</option>
+                          </options>
+                      </c>
+                  </configuration>
+              </plugin>
+       </plugins>-->
+		   
 	       <!-- Set Java compiler source and target versions -->
 	       <plugin>
 	           <groupId>org.apache.maven.plugins</groupId>
