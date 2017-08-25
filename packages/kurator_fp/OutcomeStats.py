@@ -177,7 +177,7 @@ def main():
    pythonTupleToNmpy(statstpl)
 
         #produces a Json file from numpy array of stats
-   numpyArrayToJsonFile(stats, optdict['outputfile'])
+   numpyArrayToJsonFile(stats, optdict['outputfile']) ####
 
        ##provide and serialize labels of validators and outcomes
        # provide for validators
