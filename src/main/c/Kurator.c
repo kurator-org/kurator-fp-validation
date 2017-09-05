@@ -1,26 +1,32 @@
 #include <Python.h>
+#include "Kurator.h"
+#include <dlfcn.h>
 
-int
-main(int argc, char *argv[])
-{
+void test() {
+    printf("Hello world!");
+}
+
+JNIEXPORT void JNICALL Java_Kurator_sayHello(JNIEnv *env, jobject obj) {
     PyObject *pName, *pModule, *pDict, *pFunc;
     PyObject *pArgs, *pValue;
     int i;
 
-    if (argc < 3) {
-        fprintf(stderr,"Usage: call pythonfile funcname [args]\n");
-        return 1;
-    }
+    dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
+
+    //if (argc < 3) {
+    //    fprintf(stderr,"Usage: call pythonfile funcname [args]\n");
+    //    return 1;
+    //}
 
     Py_Initialize();
-    pName = PyString_FromString(argv[1]);
+    pName = PyString_FromString("hello.hello");
     // TODO Error checking of pName
 
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
 
     if (pModule != NULL) {
-        pFunc = PyObject_GetAttrString(pModule, argv[2]);
+        pFunc = PyObject_GetAttrString(pModule, "hello");
         /* pFunc is a new reference */
 
         if (pFunc && PyCallable_Check(pFunc)) {
@@ -51,22 +57,22 @@ main(int argc, char *argv[])
                 Py_DECREF(pModule);
                 PyErr_Print();
                 fprintf(stderr,"Call failed\n");
-                return 1;
+                //return 1;
             }
         }
         else {
             if (PyErr_Occurred())
                 PyErr_Print();
-            fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
+            //fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
         }
         Py_XDECREF(pFunc);
         Py_DECREF(pModule);
     }
     else {
         PyErr_Print();
-        fprintf(stderr, "Failed to load \"%s\"\n", argv[1]);
-        return 1;
+        //fprintf(stderr, "Failed to load \"%s\"\n", argv[1]);
+        //return 1;
     }
     Py_Finalize();
-    return 0;
+    //return 0;
 }
