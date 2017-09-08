@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.kurator</groupId>
 			<artifactId>kurator-validation</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -91,7 +91,7 @@
                   </configuration>
               </plugin>
        </plugins>-->
-		   
+
 	       <!-- Set Java compiler source and target versions -->
 	       <plugin>
 	           <groupId>org.apache.maven.plugins</groupId>
