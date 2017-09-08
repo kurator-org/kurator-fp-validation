@@ -75,9 +75,6 @@ components:
         def on_data(options):
             print 'WrapUp options: %s' % options
             print '### Finished Outcome Stats Workflow ###'
-    inputs:
-        workspace: workspace
-        outputfile: outputfile
     listensTo:
       - !ref NativeTest
 

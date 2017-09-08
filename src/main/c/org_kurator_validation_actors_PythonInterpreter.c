@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <dlfcn.h>
+
 #include <Python.h>
 #include "org_kurator_validation_actors_PythonInterpreter.h"
 
@@ -14,6 +16,11 @@ JNICALL Java_org_kurator_validation_actors_PythonInterpreter_run(JNIEnv *env, jo
     // JNI variables
     jboolean iscopy;
     const *jName, *jFunc;
+
+    // Load python2.7 dynamic library, symbols defined will be made
+    // available to subsequently loaded shared objects via the
+    // RTLD_GLOBAL flag
+    dlopen("libpython2.7.so", RTLD_LAZY | RTLD_GLOBAL);
 
     // initialize the Java Map interface and methods
     jclass c_Map = (*env)->FindClass(env, "java/util/HashMap");

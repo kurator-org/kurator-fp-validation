@@ -4,8 +4,8 @@ import sys
 def test(optdict):
     print "optdict: " + str(optdict)
 
-    #arr = np.array([6, 7, 8])
-    print sys.api_version
+    print np.array([6, 7, 8])
+    #print sys.api_version
 
     return {
         'test': 'Hello World!',
