@@ -75,16 +75,15 @@ First create a local git clone of this project and switch to the outcomestats br
     $ git fetch
     $ git checkout outcomestats
 
-Set an environment variable, KURATORHOME, that points to the project root directory (kurator-fp-validation) and add the packages subdirectory to the PYTHONPATH environment variable:
+Set an environment variable, KURATORHOME points to the project root directory cloned to in the previous step (kurator-fp-validation). Also add the packages subdirectory to the PYTHONPATH environment variable. Replace `{project_root}` below with the root directory of your cloned project:
 
-    $ export KURATORHOME=/home/lowery/kurator-fp-validation
+    $ export KURATORHOME={project_root}
     $ export PYTHONPATH=$KURATORHOME/packages
     
 Next, download a copy of the latest fp-validation release of the kurator-akka jar: https://github.com/kurator-org/kurator-fp-validation/releases/download/v1.0.1/kurator-fp-validation-1.0.1-SNAPSHOT-jar-with-dependencies.jar
 
-Run with the following arguments to test the outcomestats workflow:
+With the KURATORHOME environment variable set, run the jar with the following arguments to test the outcomestats workflow:
 
-    $ cd ~/Downloads
     $ java -Djava.library.path=$KURATORHOME/lib/native -jar kurator-fp-validation-1.0.1-SNAPSHOT-jar-with-dependencies.jar -f $KURATORHOME/packages/kurator_fp/workflows/outcome_stats.yaml -p configfile=$KURATORHOME/packages/kurator_fp/stats.ini -p inputfile=$KURATORHOME/packages/kurator_fp/occurrence_qc.json -p outputfile=stats.xlsx
 
 This should create a new workspace in the current directory that contains a single outputfile, stats.xlsx. Example output for a successful run shown below:
