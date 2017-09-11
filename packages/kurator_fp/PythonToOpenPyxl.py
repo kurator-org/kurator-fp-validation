@@ -57,6 +57,14 @@ def pythonToOpenpyxl(optdict):
     workspace = optdict['workspace']
     inputfile = optdict['inputfile']
     outputfile = optdict['outputfile']
+    configfile = optdict['configfile']
+
+    rowOrigin = optdict['rowOrigin']
+    colOrigin = optdict['colOrigin']
+
+    optdict = OptDict(workspace, inputfile, outputfile)  # init OptDict object
+    optdict.configure(configfile)
+    optdict.origin(rowOrigin, colOrigin)  # set origin to row 7, col 1
 
     # create the outcome stats workbook and sheet
     wb = Workbook()
@@ -79,7 +87,7 @@ def pythonToOpenpyxl(optdict):
     # report status of success or failure with descriptive text
     response.status(success, message)
 
-    return response  # input dict with additions becomes the output dict
+    return response.optdict  # input dict with additions becomes the output dict
 
 def wbInit():  #should call only once?
     wb = Workbook()
@@ -155,6 +163,7 @@ def setColumnStyles(ws, optdict):
             outcome = outcomes[colnum]
             thecell.fill =   PatternFill("solid", fgColor=outcomeFills[outcome])
             thecell.border = border
+
 
 def main():
     optdict = OptDict('./', 'occurrence_qc.json', 'stats.xlsx')  # init OptDict object

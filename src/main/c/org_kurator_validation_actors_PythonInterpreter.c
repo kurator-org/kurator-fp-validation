@@ -39,7 +39,7 @@ JNICALL Java_org_kurator_validation_actors_PythonInterpreter_run(JNIEnv *env, jo
     jName = (*env)->GetStringUTFChars(env, name, &iscopy);
     jFunc = (*env)->GetStringUTFChars(env, func, &iscopy);
 
-    printf("name: %s, func: %s\n", jName, jFunc);
+    // printf("name: %s, func: %s\n", jName, jFunc);
 
     // Initialize the python interpreter and import the module
     Py_Initialize();
@@ -56,35 +56,9 @@ JNICALL Java_org_kurator_validation_actors_PythonInterpreter_run(JNIEnv *env, jo
 
             // Create the empty optdict python argument
             pArgs = PyTuple_New(1);
-            pDict = PyDict_New();
 
-            // Get the Java Map key set and convert it to an array
-            jobject set = (*env)->CallObjectMethod(env, options, m_KeySet);
-            jobjectArray keys = (*env)->CallObjectMethod(env, set, m_ToArray);
-
-            // Size is the length of the jobjectArray
-            int jSize = (*env)->GetArrayLength(env, keys);
-
-            // Get the parameters from the map
-            for (int i = 0; i < jSize; i++) {
-
-                // Get the key from java
-                jstring jString = (*env)->GetObjectArrayElement(env, keys, i);
-                char *key = (*env)->GetStringUTFChars(env, jString, &iscopy);
-
-                // Get the value from java
-                jString = (*env)->CallObjectMethod(env, options, m_Get, jString);
-                char *value = (*env)->GetStringUTFChars(env, jString, &iscopy);
-
-                // Create the PyString objects
-                pKey = PyString_FromString(key);
-                pValue = PyString_FromString(value);
-
-                // Add the item to the PyDict
-                PyDict_SetItem(pDict, pKey, pValue);
-                Py_DECREF(pKey);
-                Py_DECREF(pValue);
-            }
+            // Get the options as a python dict
+            pDict = request_dict(env, options);
 
             // Add pDict to input args and call the function
             PyTuple_SetItem(pArgs, 0, pDict);
@@ -95,40 +69,24 @@ JNICALL Java_org_kurator_validation_actors_PythonInterpreter_run(JNIEnv *env, jo
             // Process python return value
             if (pDict != NULL) {
 
-                // Get a list of the keys from the python dict
-                pList = PyDict_Keys(pDict);
-                int map_len = PyList_Size(pList);
+                // If the function didn't return a dict, the Java
+                // return type should be NULL
+                if (!PyDict_Check(pDict)) {
+                    return 0;
+                }
 
                 // Create the response Java Map
-                jobject jMap = (*env)->NewObject(env, c_Map, m_Init, map_len);
-
-                // Iterate over return dictionary items
-                for (int i = 0; i < map_len; i++) {
-
-                    // Get the key and value from the python dict
-                    pKey = PyList_GetItem(pList, i);
-                    char* key = PyString_AsString(pKey);
-
-                    pValue = PyDict_GetItem(pDict, pKey);
-                    char* value = PyString_AsString(pValue);
-
-                    // Create Java strings for the key and value
-                    jstring jKey = (*env)->NewStringUTF(env, key);
-                    jstring jValue = (*env)->NewStringUTF(env, value);
-
-                    // Put the key and value in the Java Map
-                    (*env)->CallObjectMethod(env, jMap, m_Put, jKey, jValue);
-                }
+                jobject jMap = response_map(env, pDict);
 
                 // Return map as response
                 return jMap;
 
             } else {
-                Py_DECREF(pFunc);
-                Py_DECREF(pModule);
-                PyErr_Print();
-                fprintf(stderr, "Call failed\n");
-                return 1;
+                  Py_DECREF(pFunc);
+                  Py_DECREF(pModule);
+                  PyErr_Print();
+                  fprintf(stderr, "Call failed\n");
+                  return 1;
             }
         } else {
             if (PyErr_Occurred())
@@ -139,8 +97,10 @@ JNICALL Java_org_kurator_validation_actors_PythonInterpreter_run(JNIEnv *env, jo
         Py_DECREF(pModule);
     } else {
         PyErr_Print();
-        fprintf(stderr, "1234Failed to load \"%s\"\n", name);
+        fprintf(stderr, "Failed to load \"%s\"\n", name);
         return 1;
     }
+
+
     Py_Finalize();
 }

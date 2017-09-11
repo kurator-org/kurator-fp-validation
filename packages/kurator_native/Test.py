@@ -10,5 +10,6 @@ def test(optdict):
     return {
         'test': 'Hello World!',
         'test2': "Goodbye world!",
-        'workspace': optdict['workspace']
+        'workspace': optdict['workspace'],
+        'artifacts': { 'inputfile': 'input.csv', 'outputfile': 'output.csv' }
     }

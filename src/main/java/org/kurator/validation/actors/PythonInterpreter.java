@@ -1,5 +1,6 @@
 package org.kurator.validation.actors;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -10,6 +11,6 @@ public class PythonInterpreter {
         System.loadLibrary("kurator"); // Load native library at runtime
     }
 
-    public final synchronized native Map<String, String> run(String name, String func, Map<String, String> options);
+    public final synchronized native Map<String, Object> run(String name, String func, HashMap<String, Object> options);
 
 }

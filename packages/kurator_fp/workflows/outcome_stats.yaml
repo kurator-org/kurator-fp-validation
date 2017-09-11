@@ -33,55 +33,37 @@
 
 imports:
 
-- classpath:/org/kurator/akka/types.yaml
+- classpath:/org/kurator/validation/types.yaml
 
 components:
 
-# Inline python actor to demonstrate making a workspace on the fly to use for 
-# writing temporary workflow artifacts. 
+# Inline python actor to demonstrate making a workspace on the fly to use for
+# writing temporary workflow artifacts.
 - id: MakeWorkspace
-  type: PythonActor
+  type: NativePythonActor
   properties:
-    code: |
-        import uuid
-        import os
-        def on_start(options):
-            print 'Started MakeWorkspace'
-            print 'MakeWorkspace options: %s' % options
-            if options.has_key('workspace') == False:
-                options['workspace'] ='./workspace_'+str(uuid.uuid1())
-                if not os.path.exists(options['workspace']):
-                    os.makedirs(options['workspace'])
-            return options
-
+    module: kurator_native.MakeWorkspace
+    onStart: on_start
 
 # Create an outcome stats spreadsheet from the input json
 - id: OutcomeStats
-  type: PythonActor
+  type: NativePythonActor
   properties:
-    module: kurator_fp.OutcomeStats
-    onData: outcomestats
+    module: kurator_fp.PythonToOpenPyxl
+    onData: pythonToOpenpyxl
     inputs:
       workspace : workspace
     parameters:
-      configfile: "stats.ini"
-      inputfile: "occurrence_qc.json"
-      outputfile: "outcomeStats.xlsx"
       rowOrigin: 1
       colOrigin: 1
     listensTo:
       - !ref MakeWorkspace
 
 - id: WrapUp
-  type: PythonActor
+  type: NativePythonActor
   properties:
-    code: |
-        def on_data(options):
-            print 'WrapUp options: %s' % options
-            print '### Finished Outcome Stats Workflow ###'
-    inputs:
-        workspace: workspace
-        outputfile: outputfile
+    module: kurator_native.WrapUp
+    onData: on_data
     listensTo:
       - !ref OutcomeStats
 

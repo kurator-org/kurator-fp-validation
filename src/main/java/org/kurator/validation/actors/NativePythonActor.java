@@ -20,14 +20,17 @@ public class NativePythonActor extends KuratorActor {
     protected void onStart() throws Exception {
         String module = (String)configuration.get("module");
         String onStart = (String)configuration.get("onStart");
+        String onData = (String)configuration.get("onData");
 
-        Map<String, String> input = new HashMap<>();
+        Map<String, Object> input = new HashMap<>();
 
         if (onStart != null) {
-            Map<String, String> response = interpreter.run(module, onStart, (HashMap) input);
+            Map<String, Object> response = interpreter.run(module, onStart, (HashMap<String, Object>) input);
             broadcast(response);
+        }
 
-            // System.out.println("MODULE: " + module + "FUNC: " + onStart);
+        if (onData == null) {
+            endStreamAndStop();
         }
 
     }
@@ -46,10 +49,8 @@ public class NativePythonActor extends KuratorActor {
                 ((Map) input).putAll(settings);
             }
 
-            Map<String, String> response = interpreter.run(module, onData, (HashMap) input);
+            Map<String, Object> response = interpreter.run(module, onData, (HashMap<String, Object>) input);
             broadcast(response);
-
-            // System.out.println("MODULE: " + module + "FUNC: " + onData);
         }
     }
 
