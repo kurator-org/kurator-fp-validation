@@ -3,13 +3,17 @@ LDFLAGS=-L/usr/lib/python2.7/config-x86_64-linux-gnu -L/usr/lib -lpython2.7 -lpt
 
 JNIINC=-I/usr/lib/jvm/java-8-oracle/include/ -I/usr/lib/jvm/java-8-oracle/include/linux
 
+VPATH=src/main/c
+BUILDDIR=build
+
 OPTS=-shared -fPIC
 PROGRAMS=org_kurator_validation_actors_PythonInterpreter
+
 all: $(PROGRAMS)
 
-org_kurator_validation_actors_PythonInterpreter.o: org_kurator_validation_actors_PythonInterpreter.c
-	gcc -c $(JNIINC) $(CFLAGS) $(OPTS) org_kurator_validation_actors_PythonInterpreter.c
-org_kurator_validation_actors_PythonInterpreter: org_kurator_validation_actors_PythonInterpreter.o
-	gcc org_kurator_validation_actors_PythonInterpreter.o $(LDFLAGS) $(OPTS) -o libkurator.so
+$(BUILDDIR)/%.o: %.c
+	gcc -c $(JNIINC) $(CFLAGS) $(OPTS) $< -o $@
+org_kurator_validation_actors_PythonInterpreter: $(BUILDDIR)/org_kurator_validation_actors_PythonInterpreter.o
+	gcc $^ $(LDFLAGS) $(OPTS) -o lib/native/libkurator.so
 clean:
-	rm -f $(PROGRAMS) *.o *.pyc core
+	rm -f $(PROGRAMS) $(BUILDDIR)/*.o lib/native/libkurator.so

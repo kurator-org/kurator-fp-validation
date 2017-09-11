@@ -93,3 +93,11 @@ This should create a new workspace in the current directory that contains a sing
     WrapUp options: {'outputfile': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b/stats.xlsx', 'success': 1, 'artifacts': {'stats_report': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b/stats.xlsx'}, 'workspace': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b', 'message': 'Successfully generated outcome stats report from occurrence json', 'inputfile': '/home/lowery/kurator-fp-validation/packages/kurator_fp/occurrence_qc.json'}
     ### Finished Outcome Stats Workflow ###
 
+### Build the native python actor C code ###
+
+This step is optional if you are running on a 64-bit Debian based linux distro. However, if you wish to compile the native actor code for other architectures run the makefile from the project root directory via:
+
+    $ cd $KURATORHOME
+    $ make
+    
+The C compiler will output a compiled library to lib/native/libkurator.so
