@@ -27,13 +27,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# __author__ = "Robert A. Morris, David B. Lowery"
-# __copyright__ = "Copyright 2017 President and Fellows of Harvard College"
-# __version__ = "outcome_stats.yaml 2017-05-24T11:09:22-04:00"
+# __author__ = "David B. Lowery"
+# __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
+# __version__ = "native_python.yaml 2017-01-30T16:07:09-0500"
 
 imports:
 
-- classpath:/org/kurator/validation/types.yaml
+- classpath:/org/kurator/validation/actors.yaml
 
 components:
 
@@ -45,17 +45,17 @@ components:
     module: kurator_native.MakeWorkspace
     onStart: on_start
 
-# Create an outcome stats spreadsheet from the input json
-- id: OutcomeStats
+# Test native python actor
+- id: NativeTest
   type: NativePythonActor
   properties:
-    module: kurator_fp.PythonToOpenPyxl
-    onData: pythonToOpenpyxl
+    module: kurator_native.Test
+    onData: test
     inputs:
       workspace : workspace
     parameters:
-      rowOrigin: 1
-      colOrigin: 1
+      firstname: "Bob"
+      lastname: "Morris"
     listensTo:
       - !ref MakeWorkspace
 
@@ -65,25 +65,12 @@ components:
     module: kurator_native.WrapUp
     onData: on_data
     listensTo:
-      - !ref OutcomeStats
+      - !ref NativeTest
 
-- id: OutcomeStatsWorkflow
+- id: NativeTestWorkflow
   type: Workflow
   properties:
     actors:
       - !ref MakeWorkspace
-      - !ref OutcomeStats
+      - !ref NativeTest
       - !ref WrapUp
-    parameters:
-       inputfile:
-         actor: !ref OutcomeStats
-         parameter: inputfile
-       outputfile:
-         actor: !ref OutcomeStats
-         parameter: outputfile
-       configfile:
-         actor: !ref OutcomeStats
-         parameter: configfile
-       workspace:
-         actor: !ref MakeWorkspace
-         parameter: workspace

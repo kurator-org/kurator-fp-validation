@@ -65,3 +65,39 @@ Build this project via maven:
 This will produce a jar-with-dependencies in the target directory of this project. Run this jar from the command-line via the following:
 
     $ java -jar target/kurator-fp-validation-1.0.0-jar-with-dependencies.jar -f packages/kurator_fp/workflows/outcome_stats.yaml -p configfile=packages/kurator_fp/config/stats.ini -p inputfile=packages/kurator_fp/data/occurrence_qc.json -p outputfile=outcomeStats.xlsx -l DEBUG
+    
+### Run outcomestats workflow from release jar ###
+
+First create a local git clone of this project and switch to the outcomestats branch via:
+
+    $ git clone https://github.com/kurator-org/kurator-fp-validation.git
+    $ cd kurator-fp-validation
+    $ git fetch
+    $ git checkout outcomestats
+
+Set an environment variable, KURATORHOME points to the project root directory cloned to in the previous step (kurator-fp-validation). Also add the packages subdirectory to the PYTHONPATH environment variable. Replace `{project_root}` below with the root directory of your cloned project:
+
+    $ export KURATORHOME={project_root}
+    $ export PYTHONPATH=$KURATORHOME/packages
+    
+Next, download a copy of the latest fp-validation release of the kurator-akka jar: https://github.com/kurator-org/kurator-fp-validation/releases/download/v1.0.1/kurator-fp-validation-1.0.1-SNAPSHOT-jar-with-dependencies.jar
+
+With the KURATORHOME environment variable set, run the jar with the following arguments to test the outcomestats workflow:
+
+    $ java -Djava.library.path=$KURATORHOME/lib/native -jar kurator-fp-validation-1.0.1-SNAPSHOT-jar-with-dependencies.jar -f $KURATORHOME/packages/kurator_fp/workflows/outcome_stats.yaml -p configfile=$KURATORHOME/packages/kurator_fp/stats.ini -p inputfile=$KURATORHOME/packages/kurator_fp/occurrence_qc.json -p outputfile=stats.xlsx
+
+This should create a new workspace in the current directory that contains a single outputfile, stats.xlsx. Example output for a successful run shown below:
+
+    Started MakeWorkspace
+    MakeWorkspace options: {}
+    WrapUp options: {'outputfile': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b/stats.xlsx', 'success': 1, 'artifacts': {'stats_report': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b/stats.xlsx'}, 'workspace': './workspace_c3661654-9731-11e7-a6a7-1c1b0d64ce0b', 'message': 'Successfully generated outcome stats report from occurrence json', 'inputfile': '/home/lowery/kurator-fp-validation/packages/kurator_fp/occurrence_qc.json'}
+    ### Finished Outcome Stats Workflow ###
+
+### Build the native python actor C code ###
+
+This step is optional if you are running on a 64-bit Debian based linux distro. However, if you wish to compile the native actor code for other architectures run the makefile from the project root directory via:
+
+    $ cd $KURATORHOME
+    $ make
+    
+The C compiler will output a compiled library to lib/native/libkurator.so

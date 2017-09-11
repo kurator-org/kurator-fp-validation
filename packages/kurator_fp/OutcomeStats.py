@@ -12,219 +12,198 @@
 
 __author__ = "Robert A. Morris"
 __copyright__ = "Copyright 2016 President and Fellows of Harvard College"
-__version__ = "OutcomeStats.py 2017-01-30T16:03:54-0500"
-
-from actor_decorator import python_actor
-from OutcomeFormats import *
+__version__ = "OutcomeStats.py 2017-05-24T11:09:22-04:00"
 
 import json
-import xlsxwriter
+import Config
 import configparser
-import Args
+import argparse
+from actor_decorator import python_actor
+import numpy as np
+import sys
+import codecs
+from OptDict import OptDict
 
-class OutcomeStats:
-#   def __init__(self, workbook, worksheet,infile, outfile, configFile, origin1, origin2):
-   def __init__(self, configfile):
 
-      #with open(args.getInfile()) as data_file:
-      #           fpAkkOutput=json.load(data_file)
+def startup(dict) :
+      infile = dict['inputfile']
+           # convert fpAkka post processor json to python dict
+           #infile must be a "file-like object"
+           #See https://docs.python.org/2/glossary.html#term-file-object
+      with open(infile) as data_file:
+        fpa=json.load(data_file) #python form of fpAkka post processor json
+#
+#      print("fpa is json", is_json(fpa))
+      return fpa   #making a copy??? OK???
 
-      #with open(args.getInfile()) as data_file:
-      #   self.fpa=json.load(data_file)
 
-      config = configparser.ConfigParser()
-      config.sections()
-#      self.configFile =configFile
-      self.configFile = configfile
-#      self.configFile='stats.ini'
-      config.read(self.configFile)
-      self.validators =eval( config['DEFAULT']['validators'])
-      self.maxlength= max(len(s) for s in self.validators)
-      self.outcomes = eval(config['DEFAULT']['outcomes'])
-      self.max1= max(len(s) for s in self.validators)
-      self.max2= max(len(t) for t in self.outcomes)
-      self.maxlength = max(self.max1,self.max2)
-      #self.fpa = {}
-      #infile = 'occurrence_qc.json' #for now
+def getStatsAsNmpyArray(validators, outcomes, optdict):
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
+   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
+   fpa = startup(optdict)
+   for record in range(len(fpa)): #one record at a time
+         stats=updateValidatorStats(fpa, stats,validators, outcomes, record) 
+   return(stats)
 
-      #self.numRecords = len(self.fpa)
+def updateValidatorStats(fpa, stats, validators, outcomes, record)  :
+   data=fpa[record]["Markers"]
+   for i in range(len(validators)) :
+      validator = validators[i]
+      outcome = data.get(validator)
+      outcomeIndex = outcomes.index(outcome)
+      validatorIndex = validators.index(validator) 
+      z=np.zeros((len(validators), len(outcomes)), dtype=np.int32) #constant?
+      z.itemset((i,outcomeIndex),1)
+      stats  = stats+z
+   return stats
 
-   def getOutcomes(self) :
-      return self.outcomes
-   def getValidators(self) :
-      return self.validators
-   def getMaxLength(self):
-      return self.maxlength
+def getStats(optdict) :
+   # David L: will get the commented stuff below from optdict instead
+   #config = Config.config('stats.ini')
+   #validators = eval(config['validators'])
+   #outcomes = eval(config['outcomes'])
 
-   def initStats(self,outcomes) :
-      stats = {}
-      for outcome in outcomes:
-          stats[outcome] = 0
-      return stats
-   
-   def initValidatorStats(self,validators, outcomes) :
-      stats = {}
-      for v in validators :
-         stats[v] = self.initStats(outcomes)
-      return stats
-   
-   def updateValidatorStats(self,fpa, stats, record)  :
-      data=fpa[record]["Markers"]
-   #   print("in updateValidatorStats[",record,"]")
-      for data_k, data_v in data.items() :
-         for stats_k, stats_v in stats.items() :
-            if (stats_k == data_k):
-               stats[stats_k][data_v] += 1
-      return stats
-   
-   #typed parameter requires python3
-   def createStats(self, fpa, normalize):
-      validatorStats = self.initValidatorStats(self.validators, self.outcomes)
-      for record in range(len(fpa)):
-         self.updateValidatorStats(fpa, validatorStats, record) 
-      if normalize == True :
-         self.normalizeStats(fpa,validatorStats)
-      return validatorStats
-   
-   def normalizeStats(self,fpa,stats):
-      #fpa is dict loaded from FP-Akka json output
-      #divide outcome counts by occurrence counts
-      count=len(fpa)
-      count_f= float(count)
-   #   if (count <= 0) return(-1)
-      for validator,outcomes in stats.items():
-         stat=stats[validator]
-         for k,v in stat.items():
-            v = v/count_f
-            stat[k] = format(v, '.4f')
-   #         print("yy:",stats[validator])
-   #   print("in normalize stats=",stats)
-      return stats
-   
-   def stats2CSV(self, stats, outfile, outcomes, validators):
-      import csv
-      with open(outfile, 'w') as csvfile:
-         o=list(outcomes)
-         o.insert(0,"Validator")
-         fieldnames=tuple(o)
-         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-         writer.writeheader()
-         for v in validators:
-            row = stats[v]
-            row['Validator'] = v
-            writer.writerow(row)
-   
-   def initWorkbook(outfile):
-      """
-      Returns a workbook to be written to **outfile**
-      """
-      workbook = xlsxwriter.Workbook(outfile)
-      return workbook
-   
-   #doesn't belong in this class
-   
-   def stats2XLSX(self, workbook, worksheet, formats, stats, origin, outcomes, validators):
-   #   print("fmts=",formats)
-      bold = workbook.add_format({'bold': True})
-   #   print("stats=",stats)
-   #   print("outcomes=", outcomes)
-      print('origin=',origin)
-      headRow = origin[0]
-      headCol = origin[1]
+   validators = optdict['validators']
+   outcomes = optdict['outcomes']
+
+   stats = np.zeros((len(validators), len(outcomes)), dtype=np.int32)
+   infile = optdict['inputfile']
+
+   fpa = startup(optdict)
+   for record in range(len(fpa)):
+         stats = updateValidatorStats(fpa, stats,validators, outcomes, record) 
+   statsAsPythonLisTuples = nmpyArrayToPythonTuple(stats)
+   return statsAsPythonLisTuples
+
+    #convenience methods
+def nmpyArrayToPythonList(array):
+      try:
+            return array.tolist()
+      except TypeError:
+            return array
+
+def pythonListToNmpy(list):     #should check that the Python is a list?
+      try:
+            return(np.array(list))
+      except TypeError:
+            return list
       
-      worksheet.write(headRow ,headCol,"Validator",bold)
-      for str in outcomes :
-         col=1+headCol+outcomes.index(str) #insure order is as in outcomes list
-         worksheet.write(headRow,col, str, bold) #write col header
 
-      for k, v in stats.items():
-         col = headCol;
- ###        print("at L137 key=",k,"val=", v, "thecol=",col)
-         row = 1+headRow+validators.index(k) #put rows in order of the validators list
-         print('OutcomeStats at L141 row=',row, 'thecol=',col, 'k=',k)
-   #      print("row=",row)
-###         worksheet.write(row,0,k) #write validator name
-         worksheet.write(row,col,k) #write validator name
-         #write data for each validator in its own row
-         for outcome, statval in v.items():
-            col = headCol + 1 + outcomes.index(outcome) #put cols in order of the outcomes list
-            worksheet.write(row, col, statval,formats.get(outcome))
+def nmpyArrayToPythonTuple(array):
+      try:
+            return tuple(nmpyArrayToPythonTuple(i) for i in array)
+      except TypeError:
+            return array
 
-#def main():
-#   from Args import Args
-#   print("OutcomeStats.main()")
-#   print(type(self.outcomeFormats()))
-#   args=Args('occurrence_qc.json', 'outcomeStats.xlsx', 'stats.ini')
-#   workbook = xlsxwriter.Workbook(args.getOutfile())
-#   worksheet = workbook.add_worksheet()
-#   ocol = 3
-#   orow = 8
-   
-#   origin1 = [orow,ocol]
-#   origin2 = [5,0]
+def pythonTupleToNmpy(tuple):
+      try:
+            return np.asarray(tuple)
+      except TypeError:
+            return tuple
 
-#   stats=OutcomeStats(args)
+def pythonTupleToJson(tuple):
+      try:
+            return json.dump(tuple)
+      except TypeError:
+            return tuple
 
-@python_actor
-###def outcomestats(inputfile, outputfile, configfile, origincolumn, originrow):
-def outcomestats(inputfile, outputfile, configfile, originrow, origincolumn):
-   # load entire jason file. (Note: syntactically it is a Dictionary !!! )
-   with open(inputfile) as data_file:
-      fpAkkaOutput = json.load(data_file)
+def numpyArrayToJsonFile(array, json_file=None):
+      try:
+            if json_file is None:
+                  jason_file = 'stats.json'
+            np_array_to_list = array.tolist()
+            b = np_array_to_list
+#            print("nmpy:", b, type(b))
+            json.dump(b, codecs.open(json_file, 'w', encoding='utf-8'), sort_keys=True, indent=4)
+      except TypeError:
+            return array
 
-      ###### In this test, both normalized and non-normalized statistics are shown
-   ###    origin1 = [0, 0]  # Validator names, from which cell addr set below has names for non-normalized data
-   ###    origin2 = [5, 0]  # Validator names, from which cell addr set below has names for non-normalized data
+def labelsToJson(labels,labelname, json_file=None):
+#            print("inLabelsToJson:", labels, type(labels))
+            labelList=list(labels)
+            json_string = ""
+            if True: #json_file is None:
+                  filename = labelname +".json"
+            return json_string
 
-   ###    origin1 = [origincolumn,originrow]
-   origin1 = [origincolumn,originrow]
-   workbook = xlsxwriter.Workbook(outputfile)  # xlsxwriter model of an xlsx spreadsheet
-   worksheet = workbook.add_worksheet()  # should supply worksheet name, else defaults
-   #   stats = OutcomeStats(workbook,worksheet,data_file,outfile,configFile,origin1,origin2)
-   stats = OutcomeStats(configfile)
-   ###    worksheet.set_column(0, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   ###    worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   worksheet.set_column(origincolumn, len(stats.getOutcomes()), 3 + stats.getMaxLength())
-   #   print(stats.getOutcomes())
-   outcomeFormats = OutcomeFormats({})
-   formats = outcomeFormats.initFormats(workbook)  # shouldn't be attr of main class
-   ###################################################
-   #####createStats and stats2XLSX comprise the main #
-   # processor filling the spreadheet cells       ####
-   ###################################################
-   # if stats are normalized, results are divided by number of records
-   # otherwise, cells show total of the number of each outcome in the appropriate column
-   normalized = True
-   validatorStats = stats.createStats(fpAkkaOutput, ~normalized)
-   validatorStatsNormalized = stats.createStats(fpAkkaOutput, normalized)
+def obj_dict(obj):
+       return obj.__dict__
 
-   outcomes = stats.getOutcomes()
-   #   print("outcomes=", outcomes)
-   validators = stats.getValidators()
-   stats.stats2XLSX(workbook, worksheet, formats, validatorStats, origin1, outcomes, validators)
-   ###    stats.stats2XLSX(workbook, worksheet, formats, validatorStatsNormalized, origin2, outcomes, validators)
+# from stackoverflow.com how-do-i-check-if-a-string-is-valid-json-in-python
+# cc-by-3.0
+def is_json(myjson): 
+  try:
+    json_object = json.loads(myjson)
+  except ValueError, e:
+    return False
+  return True
 
-   workbook.close()
+def labelsToJson(labels,labelname):
+            labelList=list(labels)
+            json_string = ""
+            json_string =json.dumps(labelList)
+            return json_string
+
+def jsonToFile(jsonStr, filename):
+      theFile = open(filename, 'w') #should test success
+      if is_json(jsonStr):
+            theFile.write(jsonStr)
+            theFile.close()  #make unwriteable???
+            return True
+      else :
+            return False
 
 
 def main():
-   optdict = {}
+   config = Config.config('stats.ini')
+   validators = eval(config['validators'])
+   outcomes = eval(config['outcomes'])
+#   optdict = {'inputfile':'occurrence_qc.json', 'outputfile':'stats.json' }
+   optdict = OptDict('./', 'occurrence_qc.json', 'stats.xlsx')  # init OptDict object
 
-   ocol = 4
-   orow = 8
+   optdict.configure()  # default configuration is taken from stats.ini
+   optdict.origin(7, 1)  # set origin to row 7, col 1
 
-   optdict['inputfile'] = './data/occurrence_qc.json'
-   optdict['outputfile'] = 'outcomeStats.xlsx'
-   optdict['workspace'] = './'
-   optdict['configfile'] = './config/stats.ini'
-   optdict['loglevel'] = 'DEBUG'
-   optdict['origincolumn'] = ocol
-   optdict['originrow'] = orow
-   print ('optdict: %s' % optdict)
+   #returns Nmpy array of stats data only
+   stats = getStatsAsNmpyArray(validators, outcomes, optdict)
+        # returns a Python list of lists generated by the Nmpy array
+   statsAsPythonList = nmpyArrayToPythonList(stats)
+        # inverse serialization of nmpyArrayToPythonList(...)
+   pythonListToNmpy(statsAsPythonList)
+   
+        #produces a python  tuple of tuples from nmpy array
+   statstpl=nmpyArrayToPythonTuple(stats)
+        #produces a nmpy array from Python list of lists
+   pythonTupleToNmpy(statsAsPythonList)
+        #inverse serialization of nmpyArray from tuple of tuples
+   pythonTupleToNmpy(statstpl)
 
-   # Append distinct values of to vocab file
-   response=outcomestats(optdict)
-   print ('\nresponse: %s' % response)
+        #produces a Json file from numpy array of stats
+   numpyArrayToJsonFile(stats, optdict['outputfile']) ####
+
+       ##provide and serialize labels of validators and outcomes
+       # provide for validators
+   ltvj=labelsToJson(validators,"validators")
+   jsonToFile(ltvj, "validators.json")
+       # provide for outcomes
+   ltoj=labelsToJson(outcomes, "outcomes.json")
+   jsonToFile(ltoj, "outcomes.json")
+      ## json i/o sanity check for outcomes
+   jsonFile = open("outcomes.json",'r')
+   lbls = jsonFile.read()
+  # print("lbls:", lbls, type(lbls))
+   jsonFile.close()
+   print(is_json (lbls))
+   ### In linux examine *.json e.g. with "more" and check dates
+   ### of all of {stats,outcomes,validators}.json
+
+   # David: aggregates the three results into a single json file
+   jsonDict = { 'validators': validators, 'outcomes': outcomes, 'stats': stats.tolist() }
+
+   with open('results.json', 'w') as outfile:
+       json.dump(jsonDict, outfile)
 
 if __name__ == '__main__':
    main()

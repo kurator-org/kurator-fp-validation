@@ -1,0 +1,10 @@
+cd target/classes
+javah org.kurator.validation.actors.PythonInterpreter
+mv org_kurator_validation_actors_PythonInterpreter.h ../../src/main/c/
+
+cd ../../src/main/c
+gcc -c -fPIC org_kurator_validation_actors_PythonInterpreter.c -o kurator.o -I"/usr/lib/jvm/java-8-oracle/include" -I"/usr/lib/jvm/java-8-oracle/include/linux" -I"/usr/include/python2.7"
+gcc -shared -o libkurator.so kurator.o -L"/usr/include/python2.7" -lpython2.7
+mv libkurator.so ../../../lib/native/
+
+java -Djava.library.path=/home/lowery/IdeaProjects/kurator-fp-validation/lib/native ...
